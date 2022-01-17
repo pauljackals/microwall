@@ -34,7 +34,6 @@ app.use(expressSession({
 app.use(passport.initialize())
 app.use(passport.session())
 
-
 const User = require("./models/User");
 passport.use(new passportLocal.Strategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());

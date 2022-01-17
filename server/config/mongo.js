@@ -5,9 +5,9 @@ const password = encodeURIComponent(process.env.MONGO_PASSWORD)
 const port = process.env.MONGO_PORT || 27017
 const database = process.env.MONGO_DATABASE || "db"
 
-mongoose.connect(`mongodb://${username}:${password}@localhost:${port}/${database}?authSource=admin`, {
+mongoose.connect(`mongodb://${username}:${password}@localhost:${port}/${database}`, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
     
 }).then(() => {
     console.log("Connected to MongoDB")
