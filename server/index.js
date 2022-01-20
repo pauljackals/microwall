@@ -9,7 +9,6 @@ const expressSession = require("express-session")
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const passport = require("passport")
-const passportLocal = require("passport-local")
 const mongoStore = require("./config/mongoStore")
 const router = require("./routes/router")
 const errorHandler = require("./utils/errorHandler")
@@ -32,17 +31,16 @@ app.use(expressSession({
     resave: false,
     store: mongoStore,
 }))
-app.use(router)
 
 app.use(passport.initialize())
 app.use(passport.session())
 
 const User = require("./models/User")
-// passport.use(new passportLocal.Strategy(User.authenticate()));
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
+app.use(router)
 app.use(errorHandler)
 
 const port = process.env.SERVER_PORT || 5000
