@@ -10,5 +10,23 @@ export default {
             firstName,
             lastName
         })
+    },
+    login(username, password) {
+        return axios.post("/login",
+            {
+                username,
+                password
+            },
+            {
+                withCredentials: true,
+                credentials: "include"
+            }
+        )
+    },
+    logout() {
+        return axios.delete("/logout", {
+            withCredentials: true,
+            credentials: "include"
+        })
     }
 }

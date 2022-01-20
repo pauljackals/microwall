@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>register</h1>
+        <h1>login</h1>
         <form @submit.prevent="register">
             <span v-if="error" class="error">{{error}}</span>
 
@@ -13,19 +13,8 @@
                 <span v-for="(error, index) in user.password.errors" :key="index" class="error">{{error}}</span>
             </div>
             <input type="password" v-model="user.password.value" :placeholder="user.password.name">
-            <input type="password" v-model="user.passwordRepeat.value" :placeholder="user.passwordRepeat.name">
 
-            <div v-if="user.firstName.errors">
-                <span v-for="(error, index) in user.firstName.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="text" v-model="user.firstName.value" :placeholder="user.firstName.name">
-
-            <div v-if="user.lastName.errors">
-                <span v-for="(error, index) in user.lastName.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="text" v-model="user.lastName.value" :placeholder="user.lastName.name">
-
-            <input type="submit" value="register">
+            <input type="submit" value="log in">
         </form>
     </div>
 </template>
@@ -33,10 +22,10 @@
 <script>
 import Api from "../servies/Api"
 
-const defaultValue = (name, noCheck) => ({
+const defaultValue = name => ({
     name,
     value: "",
-    errors: !noCheck && []
+    errors: []
 })
 const maxLength = 32
 export default {
@@ -44,10 +33,7 @@ export default {
         return  {
             user: {
                 username: defaultValue("username"),
-                password: defaultValue("password"),
-                passwordRepeat: defaultValue("repeat password", true),
-                firstName: defaultValue("first name"),
-                lastName: defaultValue("last name")
+                password: defaultValue("password")
             },
             error: ""
         }
@@ -56,9 +42,6 @@ export default {
         resetErrors() {
             Object.entries(this.user).forEach(entry => {
                 const {errors} = entry[1]
-                if(!errors){
-                    return
-                }
                 errors.splice(0, errors.length)
             })
             this.error = ""
@@ -70,9 +53,6 @@ export default {
 
             userEntries.forEach(entry => {
                 const {value, errors, name} = entry[1]
-                if(!errors){
-                    return
-                }
                 if(value.length===0) {
                     errors.push(`${name} must not be empty`)
 
@@ -83,25 +63,16 @@ export default {
 
             const {
                 username,
-                password,
-                passwordRepeat,
-                firstName,
-                lastName
+                password
             } = this.user
 
-            if(password.value!==passwordRepeat.value) {
-                password.errors.push("passwords don't match")
-            }
-
-            if(userEntries.some(([_, {errors}]) => errors && errors.length)) {
+            if(userEntries.some(([_, {errors}]) => errors.length)) {
                 return
             }
             
-            Api.register(...[
+            Api.login(...[
                 username,
-                password,
-                firstName,
-                lastName
+                password
             ].map(field => field.value)).then(() => {
                 this.$router.push({
                     name: 'Home'

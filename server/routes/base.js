@@ -31,8 +31,7 @@ router.post("/login", (req, res, next) => {
             return next(err)
 
         } else if (!user) {
-            err = new Error("!user")
-            return next(err)
+            return next(info)
         }
         req.login(user, (err) => {
             if(err) {
@@ -47,7 +46,11 @@ router.post("/login", (req, res, next) => {
 
 router.delete("/logout", (req, res) => {
     req.logout()
-    res.status(200).json({message: "logged out"})
+    req.session.destroy(() => {
+        res.clearCookie("connect.sid");
+        res.status(200).json({message: "logged out"})
+    })
+    
 })
 
 module.exports = router
