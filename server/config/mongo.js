@@ -8,12 +8,16 @@ const database = process.env.MONGO_DATABASE || "db"
 mongoose.connect(`mongodb://${username}:${password}@localhost:${port}/${database}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-    
-}).then(() => {
-    console.log("Connected to MongoDB")
+})
 
-}).catch(error => {
-    console.error("Can't connect to MongoDB\n", error)
+mongoose.connection.on("connected", () => {
+    console.log("Connected to MongoDB")
+})
+mongoose.connection.on("error", error => {
+    console.error("Error on MongoDB connection\n", error)
+})
+mongoose.connection.on("disconnected", () => {
+    console.log("Disconnected from MongoDB")
 })
 
 module.exports = mongoose
