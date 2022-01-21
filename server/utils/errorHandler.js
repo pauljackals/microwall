@@ -7,6 +7,7 @@ const {
     IncorrectUsernameError
 } = require("passport-local-mongoose").errors
 const AuthenticationError = require("passport/lib/errors/authenticationerror")
+const {NotFoundError} = require("../utils/errors")
 
 module.exports = (err, req, res, next) => {
     if(err instanceof ValidationError) {
@@ -32,6 +33,9 @@ module.exports = (err, req, res, next) => {
 
     } else if (err instanceof AuthenticationError) {
         res.status(401).json({message: "user must be logged in"})
+
+    } else if (err instanceof NotFoundError) {
+        res.status(404).json({message: "resource not found"})
 
     } else {
         res.status(500).json({message: "unknown error"})

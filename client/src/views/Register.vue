@@ -31,12 +31,14 @@
 </template>
 
 <script>
-import Api from "../servies/Api"
+import api from "../servies/api"
 
-const defaultValue = (name, noCheck) => ({
+const defaultValue = (name, type="text", exclude) => ({
     name,
-    value: "",
-    errors: !noCheck && []
+    value: undefined,
+    errors: [],
+    exclude,
+    type
 })
 const maxLength = 32
 export default {
@@ -44,8 +46,8 @@ export default {
         return  {
             user: {
                 username: defaultValue("username"),
-                password: defaultValue("password"),
-                passwordRepeat: defaultValue("repeat password", true),
+                password: defaultValue("password", "password"),
+                passwordRepeat: defaultValue("repeat password", "password", true),
                 firstName: defaultValue("first name"),
                 lastName: defaultValue("last name")
             },
@@ -54,26 +56,21 @@ export default {
     },
     methods: {
         resetErrors() {
-            Object.entries(this.user).forEach(entry => {
-                const {errors} = entry[1]
-                if(!errors){
-                    return
-                }
-                errors.splice(0, errors.length)
+            Object.values(this.user).forEach(field => {
+                field.errors = []
             })
             this.error = ""
         },
         register() {
             this.resetErrors()
 
-            const userEntries = Object.entries(this.user)
+            const fields = Object.values(this.user)
 
-            userEntries.forEach(entry => {
-                const {value, errors, name} = entry[1]
-                if(!errors){
+            fields.forEach(({value, errors, name, exclude}) => {
+                if(exclude){
                     return
                 }
-                if(value.length===0) {
+                if(value===undefined || value.length===0) {
                     errors.push(`${name} must not be empty`)
 
                 } else if(value.length > maxLength) {
@@ -93,11 +90,11 @@ export default {
                 password.errors.push("passwords don't match")
             }
 
-            if(userEntries.some(([_, {errors}]) => errors && errors.length)) {
+            if(fields.some(({errors, exclude}) => !exclude && errors.length)) {
                 return
             }
             
-            Api.register(...[
+            api.register(...[
                 username,
                 password,
                 firstName,

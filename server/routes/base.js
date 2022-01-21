@@ -1,6 +1,7 @@
 const passport = require("passport")
 const User = require("../models/User")
 const authenticationCheck = require("../utils/authenticationCheck")
+const { makeUserSafe } = require("../utils/functions")
 const router = require("express").Router()
 
 router.post("/register", (req, res, next) => {
@@ -15,13 +16,12 @@ router.post("/register", (req, res, next) => {
         username,
         firstName,
         lastName
-    }), password, (err, user) => {
+    }), password, (err, userSaved) => {
 
         if(err) {
             return next(err)
         }
-        user.hash = undefined
-        user.salt = undefined
+        const user = makeUserSafe(userSaved)
         res.status(201).json({user})
     })
 })
@@ -38,9 +38,8 @@ router.post("/login", (req, res, next) => {
             if(err) {
                 return next(err)
             }
-            user.hash = undefined
-            user.salt = undefined
-            res.status(201).json({user})
+            const userSafe = makeUserSafe(user)
+            res.status(201).json({user: userSafe})
         })
     })(req, res, next)
 })

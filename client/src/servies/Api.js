@@ -34,5 +34,29 @@ export default {
             withCredentials: true,
             credentials: "include"
         })
+    },
+    updateUserData(firstName, lastName) {
+        return axios.patch("/user/me",
+            {
+                firstName,
+                lastName
+            },
+            {
+                withCredentials: true,
+                credentials: "include"
+            }
+        )
+    },
+    updateUserLogin(password, passwordOld) {
+        return axios.patch("/user/me/login",
+            {
+                password,
+                passwordOld
+            },
+            {
+                withCredentials: true,
+                credentials: "include"
+            }
+        )
     }
 }

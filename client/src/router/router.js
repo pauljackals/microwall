@@ -3,7 +3,9 @@ import Home from "../views/Home.vue"
 import Register from "../views/Register.vue"
 import Login from "../views/Login.vue"
 import NotFound from "../views/NotFound.vue"
-import Profile from "../views/Profile.vue"
+import Profile from "../views/profile/Profile.vue"
+import EditData from "../views/profile/EditData.vue"
+import EditLogin from "../views/profile/EditLogin.vue"
 
 const routes = [
     {
@@ -25,6 +27,16 @@ const routes = [
         path: "/me",
         component: Profile,
         name: "Profile"
+    },
+    {
+        path: "/me/edit",
+        component: EditData,
+        name: "EditData"
+    },
+    {
+        path: "/me/edit-login",
+        component: EditLogin,
+        name: "EditLogin"
     },
     {
         path: "/:path(.*)",

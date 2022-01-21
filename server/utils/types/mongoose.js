@@ -1,6 +1,7 @@
 module.exports = {
     STRING: {
         type: String,
-        required: "required"
+        required: "required",
+        maxLength: 128
     }
 }

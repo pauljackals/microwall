@@ -1,13 +1,13 @@
 import actions from "./types/actions"
 import mutations from "./types/mutations"
-import Api from "../servies/Api"
+import api from "../servies/api"
 
 export default {
     [actions.LOGIN]({commit}, {
         username,
         password
     }) {
-        return Api.login(
+        return api.login(
             username,
             password
 
@@ -17,13 +17,25 @@ export default {
     },
 
     [actions.LOGOUT]({commit}) {
-        return Api.logout().then(() => {
+        return api.logout().then(() => {
             commit(mutations.CLEAR_USER)
         })
     },
 
     [actions.GET_USER_DATA]({commit}) {
-        return Api.getUserData().then(response => {
+        return api.getUserData().then(response => {
+            commit(mutations.SET_USER, response.data.user)
+        })
+    },
+
+    [actions.UPDATE_USER_DATA]({commit}, {firstName, lastName}) {
+        return api.updateUserData(firstName, lastName).then(response => {
+            commit(mutations.SET_USER, response.data.user)
+        })
+    },
+
+    [actions.UPDATE_USER_LOGIN]({commit}, {password, passwordOld}) {
+        return api.updateUserLogin(password, passwordOld).then(response => {
             commit(mutations.SET_USER, response.data.user)
         })
     }
