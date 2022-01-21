@@ -104,11 +104,11 @@ export default {
                 lastName
             ].map(field => field.value)).then(() => {
                 this.$router.push({
-                    name: 'Home'
+                    name: 'Login'
                 })
 
             }).catch(error => {
-                this.error = error.response ? error.response.data.message : "server error"
+                this.error = error.response ? error.response.data.message : "connection error"
             })
         }
     }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <h1>login</h1>
-        <form @submit.prevent="register">
+        <form @submit.prevent="login">
             <span v-if="error" class="error">{{error}}</span>
 
             <div v-if="user.username.errors">
@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import Api from "../servies/Api"
+import actions from "../store/types/actions"
+import {mapActions} from "vuex"
 
 const defaultValue = name => ({
     name,
@@ -46,7 +47,7 @@ export default {
             })
             this.error = ""
         },
-        register() {
+        login() {
             this.resetErrors()
 
             const userEntries = Object.entries(this.user)
@@ -69,19 +70,23 @@ export default {
             if(userEntries.some(([_, {errors}]) => errors.length)) {
                 return
             }
-            
-            Api.login(...[
-                username,
-                password
-            ].map(field => field.value)).then(() => {
+
+            this.loginStore(Object.entries({username, password}).reduce((object, [key, value]) => {
+                object[key]=value.value
+                return object
+
+            }, {})).then(() => {
                 this.$router.push({
                     name: 'Home'
                 })
 
             }).catch(error => {
-                this.error = error.response ? error.response.data.message : "server error"
+                this.error = error.response ? error.response.data.message : "connection error"
             })
-        }
+        },
+        ...mapActions({
+            loginStore: actions.LOGIN
+        })
     }
 }
 </script>

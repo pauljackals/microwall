@@ -13,3 +13,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.wrapper-inline {
+  display: inline;
+}
+</style>

@@ -3,12 +3,14 @@
 </template>
 
 <script>
-import Api from "../servies/Api"
+import actions from "../store/types/actions"
+import {mapActions} from "vuex"
+
 export default {
     name: "LogoutButton",
     methods: {
         logout() {
-            Api.logout().then(() => {
+            this.logoutStore().then(() => {
                 this.$router.push({
                     name: 'Home'
                 })
@@ -16,7 +18,10 @@ export default {
             }).catch(error => {
                 console.error(error)
             })
-        }
+        },
+        ...mapActions({
+            logoutStore: actions.LOGOUT
+        })
     }
 }
 </script>
