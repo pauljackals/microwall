@@ -1,5 +1,6 @@
 const passport = require("passport")
 const User = require("../models/User")
+const authenticationCheck = require("../utils/authenticationCheck")
 const router = require("express").Router()
 
 router.post("/register", (req, res, next) => {
@@ -44,7 +45,7 @@ router.post("/login", (req, res, next) => {
     })(req, res, next)
 })
 
-router.delete("/logout", (req, res) => {
+router.delete("/logout", authenticationCheck, (req, res) => {
     req.logout()
     req.session.destroy(() => {
         res.clearCookie("connect.sid");

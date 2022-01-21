@@ -1,4 +1,5 @@
 export default {
     LOGIN: "LOGIN",
-    LOGOUT: "LOGOUT"
+    LOGOUT: "LOGOUT",
+    GET_USER_DATA: "GET_USER_DATA"
 }

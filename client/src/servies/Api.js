@@ -28,5 +28,11 @@ export default {
             withCredentials: true,
             credentials: "include"
         })
+    },
+    getUserData() {
+        return axios.get("/user/me", {
+            withCredentials: true,
+            credentials: "include"
+        })
     }
 }
