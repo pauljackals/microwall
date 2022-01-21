@@ -15,6 +15,6 @@ export default {
     },
 
     [mutations.CLEAR_USER](state) {
-        state[stateTypes.USER] = null
+        state[stateTypes.USER] = {}
     }
 }

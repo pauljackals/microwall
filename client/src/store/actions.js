@@ -12,17 +12,7 @@ export default {
             password
 
         ).then(response => {
-            const {
-                username,
-                firstName,
-                lastName
-            } = response.data.user
-
-            commit(mutations.SET_USER,
-                username,
-                firstName,
-                lastName
-            )
+            commit(mutations.SET_USER, response.data.user)
         })
     },
 
@@ -34,17 +24,7 @@ export default {
 
     [actions.GET_USER_DATA]({commit}) {
         return Api.getUserData().then(response => {
-            const {
-                username,
-                firstName,
-                lastName
-            } = response.data.user
-
-            commit(mutations.SET_USER,
-                username,
-                firstName,
-                lastName
-            )
+            commit(mutations.SET_USER, response.data.user)
         })
     }
 }

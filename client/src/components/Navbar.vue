@@ -1,17 +1,21 @@
 <template>
     <div>
         <router-link :to="{name: 'Home'}">home</router-link>
-        <div class="wrapper-inline" v-if="!user">
+        <div class="wrapper-inline" v-if="!loggedIn">
             <router-link :to="{name: 'Register'}">register</router-link>
             <router-link :to="{name: 'Login'}">login</router-link>
         </div>
-        <LogoutButton v-else/>
+        <div class="wrapper-inline" v-else>
+            <router-link :to="{name: 'Profile'}">{{user.username}}</router-link>
+            <LogoutButton/>
+        </div>
     </div>
 </template>
 
 <script>
 import LogoutButton from "./LogoutButton.vue"
-import {mapState} from "vuex"
+import {mapGetters, mapState} from "vuex"
+import getters from "../store/types/getters"
 import state from "../store/types/state"
 
 export default {
@@ -22,6 +26,9 @@ export default {
     computed: {
         ...mapState({
             user: state.USER
+        }),
+        ...mapGetters({
+            loggedIn: getters.LOGGED_IN
         })
     }
 }
