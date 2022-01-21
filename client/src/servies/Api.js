@@ -58,5 +58,8 @@ export default {
                 credentials: "include"
             }
         )
-    }
+    },
+    getUsers() {
+        return axios.get("/user")
+    },
 }

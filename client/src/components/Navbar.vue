@@ -1,6 +1,7 @@
 <template>
     <div>
         <router-link :to="{name: 'Home'}">home</router-link>
+        <router-link :to="{name: 'UserList'}">users</router-link>
         <div class="wrapper-inline" v-if="!loggedIn">
             <router-link :to="{name: 'Register'}">register</router-link>
             <router-link :to="{name: 'Login'}">login</router-link>

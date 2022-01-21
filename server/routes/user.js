@@ -37,4 +37,11 @@ router.patch("/me/login", authenticationCheck, (req, res, next) => {
     })
 })
 
+router.get("/", (req, res, next) => {
+    User.find().select("username").exec().then(users => {
+        res.status(200).json({users})
+    
+    }).catch(err => next(err))
+})
+
 module.exports = router
