@@ -62,4 +62,13 @@ export default {
     getUsers() {
         return axios.get("/user")
     },
+    getUser(_id) {
+        return axios.get(`/user/${_id}`)
+    },
+    inviteFriend(_id) {
+        return axios.patch(`/user/${_id}/friend`, {}, {
+            withCredentials: true,
+            credentials: "include"
+        })
+    }
 }

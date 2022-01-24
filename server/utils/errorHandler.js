@@ -7,7 +7,11 @@ const {
     IncorrectUsernameError
 } = require("passport-local-mongoose").errors
 const AuthenticationError = require("passport/lib/errors/authenticationerror")
-const {NotFoundError} = require("../utils/errors")
+const {
+    NotFoundError,
+    UserSelfReferenceError,
+    FriendError
+} = require("../utils/errors")
 
 module.exports = (err, req, res, next) => {
     if(err instanceof ValidationError) {
@@ -36,6 +40,12 @@ module.exports = (err, req, res, next) => {
 
     } else if (err instanceof NotFoundError) {
         res.status(404).json({message: "resource not found"})
+
+    } else if (err instanceof UserSelfReferenceError) {
+        res.status(409).json({message: "user must not perform this action on themselves"})
+
+    } else if (err instanceof FriendError) {
+        res.status(409).json({message: "error on friend operation"})
 
     } else {
         res.status(500).json({message: "unknown error"})

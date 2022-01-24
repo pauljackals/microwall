@@ -14,7 +14,9 @@ const generateError = name => {
 }
 
 module.exports = [
-    "NotFoundError"
+    "NotFoundError",
+    "UserSelfReferenceError",
+    "FriendError"
 
 ].reduce((object, error) => {
     object[error] = generateError(error)

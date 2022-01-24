@@ -7,7 +7,7 @@
             <router-link :to="{name: 'Login'}">login</router-link>
         </div>
         <div class="wrapper-inline" v-else>
-            <router-link :to="{name: 'Profile'}">{{user.username}}</router-link>
+            <router-link :to="{name: 'MyProfile'}">{{user.username}}</router-link>
             <LogoutButton/>
         </div>
     </div>

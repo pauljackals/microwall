@@ -1,3 +1,4 @@
 export default {
-    LOGGED_IN: "LOGGED_IN"
+    LOGGED_IN: "LOGGED_IN",
+    FRIENDS_COMBINED: "FRIENDS_COMBINED"
 }

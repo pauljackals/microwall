@@ -1,7 +1,7 @@
 <template>
     <div>
         <h1>user data</h1>
-        <router-link :to="{name: 'Profile'}">cancel</router-link>
+        <router-link :to="{name: 'MyProfile'}">cancel</router-link>
         <form @submit.prevent="update">
             <span v-if="error" class="error">{{error}}</span>
 
@@ -78,10 +78,11 @@ export default {
             if(fields.some(({errors}) => errors.length)) {
                 return
             }
-
-            this.updateUserData(mapFields(fields)).then(() => this.$router.push({
-                name: 'Profile'
+            
+            this.updateUserData(mapFields(this.user)).then(() => this.$router.push({
+                name: 'MyProfile'
             })).catch(error => {
+                console.log(error);
                 this.error = error.response ? error.response.data.message : "connection error"
             })
         },

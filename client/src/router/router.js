@@ -28,10 +28,13 @@ const routes = [
     {
         path: "/me",
         component: Profile,
-        name: "Profile"
+        name: "MyProfile",
+        props: {
+            me: true
+        }
     },
     {
-        path: "/me/edit",
+        path: "/me/edit-data",
         component: EditData,
         name: "EditData"
     },
@@ -45,6 +48,12 @@ const routes = [
         path: "/user",
         component: UserList,
         name: "UserList"
+    },
+    {
+        path: "/user/:id",
+        component: Profile,
+        name: "Profile",
+        props: true
     },
 
     {
