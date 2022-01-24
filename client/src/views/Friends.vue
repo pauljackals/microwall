@@ -11,24 +11,12 @@
 
 <script>
 import {mapState} from "vuex"
-import api from "../servies/api"
 import UserList from "../components/UserList.vue"
 import state from "../store/types/state"
 
 export default {
-    data() {
-        return {
-            users: []
-        }
-    },
     components: {
         UserList
-    },
-    created() {
-        api.getUsers().then(response => {
-            this.users = response.data.users
-
-        }).catch(() => {})
     },
     computed: {
         ...mapState({

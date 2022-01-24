@@ -8,7 +8,7 @@
         </div>
         <div class="wrapper-inline" v-else>
             <router-link :to="{name: 'Friends'}">friends</router-link>
-            <router-link :to="{name: 'MyProfile'}">{{user.username}}</router-link>
+            <router-link :to="{name: 'Profile', params: {id: 'me'} }">{{user.username}}</router-link>
             <LogoutButton/>
         </div>
     </div>

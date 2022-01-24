@@ -1,6 +1,10 @@
 import axios from "axios"
 
 axios.defaults.baseURL = "http://localhost:5000"
+const authenticationConfig = {
+    withCredentials: true,
+    credentials: "include"
+}
 
 export default {
     register(username, password, firstName, lastName) {
@@ -12,89 +16,50 @@ export default {
         })
     },
     login(username, password) {
-        return axios.post("/login",
-            {
-                username,
-                password
-            },
-            {
-                withCredentials: true,
-                credentials: "include"
-            }
-        )
+        return axios.post("/login", {
+            username,
+            password
+        }, authenticationConfig)
     },
     logout() {
-        return axios.delete("/logout", {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.delete("/logout", authenticationConfig)
     },
     getUserData() {
-        return axios.get("/user/me", {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.get("/user/me", authenticationConfig)
     },
     updateUserData(firstName, lastName) {
-        return axios.patch("/user/me",
-            {
-                firstName,
-                lastName
-            },
-            {
-                withCredentials: true,
-                credentials: "include"
-            }
-        )
+        return axios.patch("/user/me", {
+            firstName,
+            lastName
+        }, authenticationConfig)
     },
     updateUserLogin(password, passwordOld) {
-        return axios.patch("/user/me/login",
-            {
-                password,
-                passwordOld
-            },
-            {
-                withCredentials: true,
-                credentials: "include"
-            }
-        )
+        return axios.patch("/user/me/login", {
+            password,
+            passwordOld
+        }, authenticationConfig)
     },
-    
+
     getUsers() {
-        return axios.get("/user")
+        return axios.get("/user", authenticationConfig)
     },
     getUser(_id) {
         return axios.get(`/user/${_id}`)
     },
 
     inviteFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/add`, {}, {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.patch(`/user/${_id}/friend/add`, {}, authenticationConfig)
     },
     declineFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/decline`, {}, {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.patch(`/user/${_id}/friend/decline`, {}, authenticationConfig)
     },
     removeFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/remove`, {}, {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.patch(`/user/${_id}/friend/remove`, {}, authenticationConfig)
     },
     acceptFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/accept`, {}, {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.patch(`/user/${_id}/friend/accept`, {}, authenticationConfig)
     },
     cancelFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/cancel`, {}, {
-            withCredentials: true,
-            credentials: "include"
-        })
+        return axios.patch(`/user/${_id}/friend/cancel`, {}, authenticationConfig)
     }
 }

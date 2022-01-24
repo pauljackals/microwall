@@ -45,7 +45,9 @@ router.patch("/me/login", authenticationCheck, (req, res, next) => {
 })
 
 router.get("/", (req, res, next) => {
-    User.find().select("username").exec().then(users => {
+    const options = req.isAuthenticated() ? {_id: {$ne: req.user._id}} : {}
+    
+    User.find(options).select("username").exec().then(users => {
         res.status(200).json({users})
     
     }).catch(err => next(err))

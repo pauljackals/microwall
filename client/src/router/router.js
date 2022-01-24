@@ -27,20 +27,12 @@ const routes = [
     },
 
     {
-        path: "/me",
-        component: Profile,
-        name: "MyProfile",
-        props: {
-            me: true
-        }
-    },
-    {
-        path: "/me/edit-data",
+        path: "/user/me/edit-data",
         component: EditData,
         name: "EditData"
     },
     {
-        path: "/me/edit-login",
+        path: "/user/me/edit-login",
         component: EditLogin,
         name: "EditLogin"
     },

@@ -1,7 +1,7 @@
 <template>
     <div>
         <h1>login data</h1>
-        <router-link :to="{name: 'MyProfile'}">cancel</router-link>
+        <router-link :to="{name: 'Profile', params:{id:'me'} }">cancel</router-link>
         <form @submit.prevent="update">
             <span v-if="error" class="error">{{error}}</span>
 
@@ -87,7 +87,7 @@ export default {
             }
 
             this.updateUserLogin(mapFields({password, passwordOld})).then(() => this.$router.push({
-                name: 'MyProfile'
+                name: 'Profile', params:{id:'me'} 
             })).catch(error => {
                     this.error = error.response ? error.response.data.message : "connection error"
                 })
