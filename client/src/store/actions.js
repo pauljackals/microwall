@@ -46,11 +46,51 @@ export default {
     [actions.INVITE_FRIEND]({commit, state}, {_id}) {
         return api.inviteFriend(_id).then(response => {
             commit(mutations.UPDATE_USER, {
-                invitationsSent: [
-                    ...state[stateTypes.USER].invitationsSent,
+                invitesSent: [
+                    ...state[stateTypes.USER].invitesSent,
                     response.data.user
                 ]
             })
         })
-    }
+    },
+
+    [actions.DECLINE_FRIEND]({commit, state}, {_id}) {
+        return api.declineFriend(_id).then(response => {
+            const {_id} = response.data.user
+            commit(mutations.UPDATE_USER, {
+                invitesReceived: state[stateTypes.USER].invitesSent.filter(user => user._id !== _id)
+            })
+        })
+    },
+
+    [actions.REMOVE_FRIEND]({commit, state}, {_id}) {
+        return api.removeFriend(_id).then(response => {
+            const {_id} = response.data.user
+            commit(mutations.UPDATE_USER, {
+                friends: state[stateTypes.USER].friends.filter(user => user._id !== _id)
+            })
+        })
+    },
+
+    [actions.ACCEPT_FRIEND]({commit, state}, {_id}) {
+        return api.acceptFriend(_id).then(response => {
+            const friend = response.data.user
+            commit(mutations.UPDATE_USER, {
+                invitesReceived: state[stateTypes.USER].friends.filter(user => user._id !== friend._id),
+                friends: [
+                    ...state[stateTypes.USER].friends,
+                    friend
+                ]
+            })
+        })
+    },
+
+    [actions.CANCEL_FRIEND]({commit, state}, {_id}) {
+        return api.cancelFriend(_id).then(response => {
+            const {_id} = response.data.user
+            commit(mutations.UPDATE_USER, {
+                invitesSent: state[stateTypes.USER].friends.filter(user => user._id !== _id)
+            })
+        })
+    },
 }

@@ -59,14 +59,40 @@ export default {
             }
         )
     },
+    
     getUsers() {
         return axios.get("/user")
     },
     getUser(_id) {
         return axios.get(`/user/${_id}`)
     },
+
     inviteFriend(_id) {
-        return axios.patch(`/user/${_id}/friend`, {}, {
+        return axios.patch(`/user/${_id}/friend/add`, {}, {
+            withCredentials: true,
+            credentials: "include"
+        })
+    },
+    declineFriend(_id) {
+        return axios.patch(`/user/${_id}/friend/decline`, {}, {
+            withCredentials: true,
+            credentials: "include"
+        })
+    },
+    removeFriend(_id) {
+        return axios.patch(`/user/${_id}/friend/remove`, {}, {
+            withCredentials: true,
+            credentials: "include"
+        })
+    },
+    acceptFriend(_id) {
+        return axios.patch(`/user/${_id}/friend/accept`, {}, {
+            withCredentials: true,
+            credentials: "include"
+        })
+    },
+    cancelFriend(_id) {
+        return axios.patch(`/user/${_id}/friend/cancel`, {}, {
             withCredentials: true,
             credentials: "include"
         })

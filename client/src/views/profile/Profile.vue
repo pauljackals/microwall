@@ -9,7 +9,14 @@
             <button @click="inviteFriend">invite</button>
         </div>
         <div v-else-if="canAccept">
-            <button >accept</button>
+            <button @click="acceptFriend">accept</button>
+            <button @click="declineFriend">decline</button>
+        </div>
+        <div v-else-if="canCancel">
+            <button @click="cancelFriend">cancel</button>
+        </div>
+        <div v-else-if="canRemove">
+            <button @click="removeFriend">unfriend</button>
         </div>
         <h2>{{currentUser.username}}</h2>
         <h3>{{currentUser.firstName}} {{currentUser.lastName}}</h3>
@@ -67,15 +74,37 @@ export default {
             return this.loggedIn && this.friendsCombined.every(invite => invite._id!==this.currentUser._id)
         },
         canAccept() {
-            return this.loggedIn && this.user.invitationsReceived.find(invite => invite._id===this.currentUser._id)
+            return this.loggedIn && this.user.invitesReceived.find(invite => invite._id===this.currentUser._id)
+        },
+        canCancel() {
+            return this.loggedIn && this.user.invitesSent.find(invite => invite._id===this.currentUser._id)
+        },
+        canRemove() {
+            return this.loggedIn && this.user.friends.find(invite => invite._id===this.currentUser._id)
         }
     },
     methods: {
         inviteFriend(){
             this.inviteFriendAction(this.currentUser).catch(err => console.error(err))
         },
+        declineFriend(){
+            this.declineFriendAction(this.currentUser).catch(err => console.error(err))
+        },
+        acceptFriend(){
+            this.acceptFriendAction(this.currentUser).catch(err => console.error(err))
+        },
+        removeFriend(){
+            this.removeFriendAction(this.currentUser).catch(err => console.error(err))
+        },
+        cancelFriend(){
+            this.cancelFriendAction(this.currentUser).catch(err => console.error(err))
+        },
         ...mapActions({
-            inviteFriendAction: actions.INVITE_FRIEND
+            inviteFriendAction: actions.INVITE_FRIEND,
+            declineFriendAction: actions.DECLINE_FRIEND,
+            acceptFriendAction: actions.ACCEPT_FRIEND,
+            removeFriendAction: actions.REMOVE_FRIEND,
+            cancelFriendAction: actions.CANCEL_FRIEND
         }),
     }
 }

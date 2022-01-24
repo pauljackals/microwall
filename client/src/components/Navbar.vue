@@ -1,12 +1,13 @@
 <template>
     <div>
         <router-link :to="{name: 'Home'}">home</router-link>
-        <router-link :to="{name: 'UserList'}">users</router-link>
+        <router-link :to="{name: 'Users'}">users</router-link>
         <div class="wrapper-inline" v-if="!loggedIn">
             <router-link :to="{name: 'Register'}">register</router-link>
             <router-link :to="{name: 'Login'}">login</router-link>
         </div>
         <div class="wrapper-inline" v-else>
+            <router-link :to="{name: 'Friends'}">friends</router-link>
             <router-link :to="{name: 'MyProfile'}">{{user.username}}</router-link>
             <LogoutButton/>
         </div>
@@ -34,3 +35,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+a {
+    margin-right: 10px;
+}
+</style>

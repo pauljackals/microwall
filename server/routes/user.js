@@ -62,7 +62,7 @@ router.get("/:id", (req, res, next) => {
     }).catch(err => next(err))
 })
 
-router.patch("/:id/friend", authenticationCheck, (req, res, next) => {
+router.patch("/:id/friend/add", authenticationCheck, (req, res, next) => {
     const {id} = req.params
     const {_id} = req.user
 
@@ -74,10 +74,10 @@ router.patch("/:id/friend", authenticationCheck, (req, res, next) => {
         {
             _id: id,
             friends: {$ne: _id},
-            invitationsSent: {$ne: _id},
-            invitationsReceived: {$ne: _id}
+            invitesSent: {$ne: _id},
+            invitesReceived: {$ne: _id}
         },
-        {$push: {invitationsReceived: _id}},
+        {$push: {invitesReceived: _id}},
         {new: true}
     
     ).then(userInvited => {
@@ -88,10 +88,10 @@ router.patch("/:id/friend", authenticationCheck, (req, res, next) => {
             {
                 _id,
                 friends: {$ne: id},
-                invitationsSent: {$ne: id},
-                invitationsReceived: {$ne: id}
+                invitesSent: {$ne: id},
+                invitesReceived: {$ne: id}
             },
-            {$push: {invitationsSent: id}},
+            {$push: {invitesSent: id}},
             {new: true}
             
         ).then(user => {
@@ -99,6 +99,169 @@ router.patch("/:id/friend", authenticationCheck, (req, res, next) => {
                 throw new FriendError()
             }
             res.status(200).json({user: userInvited})
+
+        }).catch(err => next(err))
+
+    }).catch(err => next(err))
+})
+
+router.patch("/:id/friend/decline", authenticationCheck, (req, res, next) => {
+    const {id} = req.params
+    const {_id} = req.user
+
+    if(id===_id.toString()){
+        return next(new UserSelfReferenceError())
+    }
+
+    User.findOneAndUpdate(
+        {
+            _id: id,
+            invitesSent: {$eq: _id}
+        },
+        {$pull: {invitesSent: _id}},
+        {new: true}
+    
+    ).then(userDeclined => {
+        if(!userDeclined) {
+            throw new FriendError()
+        }
+        User.findOneAndUpdate(
+            {
+                _id,
+                invitesReceived: {$eq: id}
+            },
+            {$pull: {invitesReceived: id}},
+            {new: true}
+            
+        ).then(user => {
+            if(!user) {
+                throw new FriendError()
+            }
+            res.status(200).json({user: userDeclined})
+
+        }).catch(err => next(err))
+
+    }).catch(err => next(err))
+})
+
+router.patch("/:id/friend/accept", authenticationCheck, (req, res, next) => {
+    const {id} = req.params
+    const {_id} = req.user
+
+    if(id===_id.toString()){
+        return next(new UserSelfReferenceError())
+    }
+
+    User.findOneAndUpdate(
+        {
+            _id: id,
+            invitesSent: {$eq: _id}
+        },
+        {
+            $pull: {invitesSent: _id},
+            $push: {friends: _id}
+
+        },
+        {new: true}
+    
+    ).then(userAccepted => {
+        if(!userAccepted) {
+            throw new FriendError()
+        }
+        User.findOneAndUpdate(
+            {
+                _id,
+                invitesReceived: {$eq: id}
+            },
+            {
+                $pull: {invitesReceived: id},
+                $push: {friends: id}
+            },
+            {new: true}
+            
+        ).then(user => {
+            if(!user) {
+                throw new FriendError()
+            }
+            res.status(200).json({user: userAccepted})
+
+        }).catch(err => next(err))
+
+    }).catch(err => next(err))
+})
+
+router.patch("/:id/friend/remove", authenticationCheck, (req, res, next) => {
+    const {id} = req.params
+    const {_id} = req.user
+
+    if(id===_id.toString()){
+        return next(new UserSelfReferenceError())
+    }
+
+    User.findOneAndUpdate(
+        {
+            _id: id,
+            friends: {$eq: _id}
+        },
+        {$pull: {friends: _id}},
+        {new: true}
+    
+    ).then(userRemoved => {
+        if(!userRemoved) {
+            throw new FriendError()
+        }
+        User.findOneAndUpdate(
+            {
+                _id,
+                friends: {$eq: id}
+            },
+            {$pull: {friends: id}},
+            {new: true}
+            
+        ).then(user => {
+            if(!user) {
+                throw new FriendError()
+            }
+            res.status(200).json({user: userRemoved})
+
+        }).catch(err => next(err))
+
+    }).catch(err => next(err))
+})
+
+router.patch("/:id/friend/cancel", authenticationCheck, (req, res, next) => {
+    const {id} = req.params
+    const {_id} = req.user
+
+    if(id===_id.toString()){
+        return next(new UserSelfReferenceError())
+    }
+
+    User.findOneAndUpdate(
+        {
+            _id: id,
+            invitesReceived: {$eq: _id}
+        },
+        {$pull: {invitesReceived: _id}},
+        {new: true}
+    
+    ).then(userRemoved => {
+        if(!userRemoved) {
+            throw new FriendError()
+        }
+        User.findOneAndUpdate(
+            {
+                _id,
+                invitesSent: {$eq: id}
+            },
+            {$pull: {invitesSent: id}},
+            {new: true}
+            
+        ).then(user => {
+            if(!user) {
+                throw new FriendError()
+            }
+            res.status(200).json({user: userRemoved})
 
         }).catch(err => next(err))
 

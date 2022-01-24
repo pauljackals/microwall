@@ -7,11 +7,11 @@ export default {
     },
 
     [getters.FRIENDS_COMBINED](state) {
-        const {friends, invitationsSent, invitationsReceived} = state[stateTypes.USER]
+        const {friends, invitesSent, invitesReceived} = state[stateTypes.USER]
         return [
             ...friends,
-            ...invitationsSent,
-            ...invitationsReceived
+            ...invitesSent,
+            ...invitesReceived
         ]
     }
 }
