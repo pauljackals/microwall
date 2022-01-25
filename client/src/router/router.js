@@ -8,6 +8,8 @@ import EditData from "../views/profile/EditData.vue"
 import EditLogin from "../views/profile/EditLogin.vue"
 import Users from "../views/Users.vue"
 import Friends from "../views/Friends.vue"
+import Wall from "../components/Wall.vue"
+import PostNew from "../views/post/New.vue"
 
 const routes = [
     {
@@ -43,10 +45,29 @@ const routes = [
         name: "Users"
     },
     {
-        path: "/user/:id",
+        path: "/user/:id/",
         component: Profile,
         name: "Profile",
-        props: true
+        props: true,
+        redirect: {name: "WallPublic"},
+        children: [
+            {
+                path: "public",
+                component: Wall,
+                name: "WallPublic",
+                props: {
+                    isPrivate: false
+                }
+            },
+            {
+                path: "private",
+                component: Wall,
+                name: "WallPrivate",
+                props: {
+                    isPrivate: true
+                }
+            }
+        ]
     },
 
     {
@@ -56,7 +77,13 @@ const routes = [
     },
 
     {
-        path: "/:path(.*)",
+        path: "/post/add",
+        component: PostNew,
+        name: "PostNew"
+    },
+
+    {
+        path: "/:path(.*)*",
         component: NotFound,
         name: "NotFound"
     }

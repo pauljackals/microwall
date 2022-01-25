@@ -1,6 +1,7 @@
 const User = require("../models/User")
 const authenticationCheck = require("../utils/authenticationCheck")
 const router = require("express").Router()
+const { POST_ACCESS_ENUM } = require("../models/types")
 
 const {
     NotFoundError,
@@ -46,7 +47,7 @@ router.patch("/me/login", authenticationCheck, (req, res, next) => {
 router.get("/", (req, res, next) => {
     const options = req.isAuthenticated() ? {_id: {$ne: req.user._id}} : {}
     
-    User.find(options).select("username").exec().then(users => {
+    User.find(options).select("-posts").exec().then(users => {
         res.status(200).json({users})
     
     }).catch(err => next(err))
@@ -54,10 +55,12 @@ router.get("/", (req, res, next) => {
 
 router.get("/:id", (req, res, next) => {
     const {id} = req.params
-    User.findById(id).exec().then(user => {
+    User.findById(id).select("+friends").populate({path:"posts", options:{sort:{date:1}}}).exec().then(user => {
         if(!user) {
             return next(new NotFoundError())
         }
+        user.posts = user.posts.filter(post => post.access!==POST_ACCESS_ENUM.PRIVATE || req.isAuthenticated() && user.friends.includes(req.user.id))
+        user.friends = undefined
         res.status(200).json({user})
 
     }).catch(err => next(err))

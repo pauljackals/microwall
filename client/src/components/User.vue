@@ -6,6 +6,7 @@
             <div v-if="!downloadedUser">
                 <router-link :to="{name: 'EditData'}">edit user data</router-link>
                 <router-link :to="{name: 'EditLogin'}">edit login data</router-link>
+                <router-link :to="{name: 'PostNew'}">add post</router-link>
             </div>
             <div v-else-if="canInvite">
                 <button @click="inviteFriend">invite</button>
@@ -21,6 +22,9 @@
                 <button @click="removeFriend">unfriend</button>
             </div>
         </div>
+        <router-link :to="{name: 'WallPublic'}">public wall</router-link>
+        <router-link v-if="loggedIn && (!downloadedUser || canRemove)" :to="{name: 'WallPrivate'}">private wall</router-link>
+        <router-view :key="$route.fullPath" :user="currentUser"/>
     </div>
 </template>
 
@@ -45,11 +49,22 @@ export default {
         }
     },
     created(){
+        if(this.user._id===this.id) {
+            this.$router.replace({
+                name: "Profile",
+                params: {id: "me"}
+            })
+            return
+        }
         if(this.id !== "me") {
             this.downloadedUser = {}
             api.getUser(this.id).then(response => {
                 this.downloadedUser = response.data.user
-            })
+            
+            }).catch(() => this.$router.replace({
+                name: "NotFound",
+                params: {path: this.$route.fullPath.slice(1).split("/")}
+            }))
         }
     },
     computed: {

@@ -3,10 +3,6 @@ import axios from "axios"
 axios.defaults.baseURL = "http://localhost:5000"
 axios.defaults.withCredentials = true
 axios.defaults.credentials = "include"
-const authenticationConfig = {
-    // withCredentials: true,
-    // credentials: "include"
-}
 
 export default {
     register(username, password, firstName, lastName) {
@@ -21,51 +17,56 @@ export default {
         return axios.post("/login", {
             username,
             password
-        }, authenticationConfig)
+        })
     },
     logout() {
-        return axios.delete("/logout", authenticationConfig)
+        return axios.delete("/logout")
     },
     getUserData() {
-        return axios.get("/user/me", authenticationConfig)
+        return axios.get("/user/me")
     },
     updateUserData(firstName, lastName) {
         return axios.patch("/user/me", {
             firstName,
             lastName
-        }, authenticationConfig)
+        })
     },
     updateUserLogin(password, passwordOld) {
         return axios.patch("/user/me/login", {
             password,
             passwordOld
-        }, authenticationConfig)
+        })
     },
 
     getUsers() {
-        return axios.get("/user", authenticationConfig)
+        return axios.get("/user")
     },
     getUser(_id) {
         return axios.get(`/user/${_id}`)
     },
 
     inviteFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/add`, {}, authenticationConfig)
+        return axios.patch(`/user/${_id}/friend/add`)
     },
     declineFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/decline`, {}, authenticationConfig)
+        return axios.patch(`/user/${_id}/friend/decline`)
     },
     removeFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/remove`, {}, authenticationConfig)
+        return axios.patch(`/user/${_id}/friend/remove`)
     },
     acceptFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/accept`, {}, authenticationConfig)
+        return axios.patch(`/user/${_id}/friend/accept`)
     },
     cancelFriend(_id) {
-        return axios.patch(`/user/${_id}/friend/cancel`, {}, authenticationConfig)
+        return axios.patch(`/user/${_id}/friend/cancel`)
     },
 
     getPosts() {
-        return axios.get("/post", authenticationConfig)
+        return axios.get("/post")
+    },
+    addPost(text, access) {
+        return axios.post("/post", {
+            text, access
+        })
     }
 }

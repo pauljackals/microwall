@@ -8,7 +8,8 @@ import {
     DECLINE_FRIEND,
     REMOVE_FRIEND,
     ACCEPT_FRIEND,
-    CANCEL_FRIEND
+    CANCEL_FRIEND,
+    ADD_POST
 } from "./types/actions"
 import { CLEAR_USER, SET_USER, UPDATE_USER } from "./types/mutations"
 import api from "../servies/api"
@@ -69,7 +70,7 @@ export default {
         return api.declineFriend(_id).then(response => {
             const {_id} = response.data.user
             commit(UPDATE_USER, {
-                invitesReceived: state[USER].invitesSent.filter(user => user._id !== _id)
+                invitesReceived: state[USER].invitesReceived.filter(user => user._id !== _id)
             })
         })
     },
@@ -87,7 +88,7 @@ export default {
         return api.acceptFriend(_id).then(response => {
             const friend = response.data.user
             commit(UPDATE_USER, {
-                invitesReceived: state[USER].friends.filter(user => user._id !== friend._id),
+                invitesReceived: state[USER].invitesReceived.filter(user => user._id !== friend._id),
                 friends: [
                     ...state[USER].friends,
                     friend
@@ -100,8 +101,16 @@ export default {
         return api.cancelFriend(_id).then(response => {
             const {_id} = response.data.user
             commit(UPDATE_USER, {
-                invitesSent: state[USER].friends.filter(user => user._id !== _id)
+                invitesSent: state[USER].invitesSent.filter(user => user._id !== _id)
             })
         })
     },
+
+    [ADD_POST]({commit, state}, {text, access}) {
+        return api.addPost(text, access).then(response => {
+            commit(UPDATE_USER, {
+                posts: [response.data.post, ...state[USER].posts]
+            })
+        })
+    }
 }

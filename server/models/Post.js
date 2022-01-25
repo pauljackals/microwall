@@ -36,7 +36,7 @@ const sortByDate = function (next) {
     this.sort("-date")
     next()
 }
-postSchema.pre(["find", "findById"], autoPopulate)
+postSchema.pre(["find", "findOne"], autoPopulate)
 postSchema.pre("find", sortByDate)
 
 module.exports = model(POST.ref, postSchema)

@@ -32,6 +32,7 @@ router.post("/", authenticationCheck, (req, res, next) => {
             posts: post._id
         
         }}).exec().then(() => {
+            post.user = req.user
             res.status(201).json({post})
         
         }).catch(err => next(err))

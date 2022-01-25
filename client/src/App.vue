@@ -1,6 +1,7 @@
 <template>
-  <Navbar/>
-  <router-view/>
+  <Navbar v-if="checked"/>
+  <router-view v-if="checked"/>
+  <div v-else>loading</div>
 </template>
 
 <script>
@@ -13,8 +14,14 @@ export default {
   components: {
     Navbar
   },
+  data() {
+    return {
+      checked: false
+    }
+  },
   created() {
-    this.getUserData().then(() => {}).catch(() => {})
+    this.getUserData().catch(() => {})
+      .finally(() => this.checked=true)
   },
   methods: {
     ...mapActions({
