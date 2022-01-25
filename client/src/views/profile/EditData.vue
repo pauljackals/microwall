@@ -22,8 +22,8 @@
 
 <script>
 import {mapState, mapActions} from "vuex"
-import state from "../../store/types/state"
-import actions from "../../store/types/actions"
+import {USER} from "../../store/types/state"
+import {UPDATE_USER_DATA} from "../../store/types/actions"
 
 const defaultValue = (name, type="text", value=undefined) => ({
     name,
@@ -87,12 +87,12 @@ export default {
             })
         },
         ...mapActions({
-            updateUserData: actions.UPDATE_USER_DATA
+            updateUserData: UPDATE_USER_DATA
         })
     },
     computed: {
         ...mapState({
-            userStore: state.USER
+            userStore: USER
         })
     },
     created() {

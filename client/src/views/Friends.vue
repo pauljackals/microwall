@@ -12,7 +12,7 @@
 <script>
 import {mapState} from "vuex"
 import UserList from "../components/UserList.vue"
-import state from "../store/types/state"
+import {USER} from "../store/types/state"
 
 export default {
     components: {
@@ -20,7 +20,7 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state.USER
+            user: USER
         })
     }
 }

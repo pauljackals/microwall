@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import actions from "../store/types/actions"
+import {LOGOUT} from "../store/types/actions"
 import {mapActions} from "vuex"
 
 export default {
@@ -20,7 +20,7 @@ export default {
             })
         },
         ...mapActions({
-            logoutStore: actions.LOGOUT
+            logoutStore: LOGOUT
         })
     }
 }

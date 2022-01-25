@@ -6,7 +6,7 @@
 <script>
 import Navbar from "./components/Navbar.vue"
 import {mapActions} from "vuex"
-import actions from "./store/types/actions"
+import {GET_USER_DATA} from "./store/types/actions"
 
 export default {
   name: 'App',
@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      getUserData: actions.GET_USER_DATA
+      getUserData: GET_USER_DATA
     })
   }
 }

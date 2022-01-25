@@ -1,16 +1,16 @@
 const router = require("express").Router()
 const Post = require("../models/Post")
 const User = require("../models/User")
-const types = require("../utils/types/mongoose")
 const authenticationCheck = require("../utils/authenticationCheck")
+const { POST_ACCESS_ENUM } = require("../models/types")
 
 router.get("/", (req, res, next) => {
-    const notPrivatePosts = {access: {$ne: types._ACCESS_ENUM.PRIVATE}}
+    const notPrivatePosts = {access: {$ne: POST_ACCESS_ENUM.PRIVATE}}
 
     const query = req.isAuthenticated() ? Post.find({$or: [
         notPrivatePosts,
         {
-            access: types._ACCESS_ENUM.PRIVATE,
+            access: POST_ACCESS_ENUM.PRIVATE,
             user: {$in: [req.user._id, ...req.user.friends.map(friend => friend._id)]}
         }
     

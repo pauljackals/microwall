@@ -1,18 +1,18 @@
-import mutations from "./types/mutations"
-import stateTypes from "./types/state"
+import { CLEAR_USER, SET_USER, UPDATE_USER } from "./types/mutations"
+import {USER} from "./types/state"
 
 export default {
-    [mutations.SET_USER](state, user) {
-        state[stateTypes.USER] = user
+    [SET_USER](state, user) {
+        state[USER] = user
     },
 
-    [mutations.CLEAR_USER](state) {
-        state[stateTypes.USER] = {}
+    [CLEAR_USER](state) {
+        state[USER] = {}
     },
     
-    [mutations.UPDATE_USER](state, payload) {
-        state[stateTypes.USER] = {
-            ...state[stateTypes.USER],
+    [UPDATE_USER](state, payload) {
+        state[USER] = {
+            ...state[USER],
             ...payload
         }
     }

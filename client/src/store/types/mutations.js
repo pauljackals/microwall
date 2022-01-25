@@ -1,5 +1,9 @@
-export default {
-    SET_USER: "SET_USER",
-    CLEAR_USER: "CLEAR_USER",
-    UPDATE_USER: "UPDATE_USER"
+const SET_USER = "SET_USER"
+const CLEAR_USER = "CLEAR_USER"
+const UPDATE_USER = "UPDATE_USER"
+
+export {
+    SET_USER,
+    CLEAR_USER,
+    UPDATE_USER
 }

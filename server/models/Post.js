@@ -1,5 +1,5 @@
 const {Schema, model} = require("../config/mongo")
-const types = require("../utils/types/mongoose")
+const { STRING, USER, DATE, POST_ACCESS_ENUM, POST, COMMENT } = require("./types")
 
 require("./Comment")
 
@@ -8,22 +8,22 @@ const validateComments = postAccess => function(comments) {
 }
 
 const postSchema = new Schema({
-    text: types.STRING,
-    user: types.USER,
-    date: types.DATE,
+    text: STRING,
+    user: USER,
+    date: DATE,
     access: {
         type: String,
-        enum: Object.values(types._ACCESS_ENUM),
+        enum: Object.values(POST_ACCESS_ENUM),
         required: true
     },
     commentsPublic: {
-        type: [types.COMMENT],
-        validate: validateComments(types._ACCESS_ENUM.PRIVATE),
+        type: [COMMENT],
+        validate: validateComments(POST_ACCESS_ENUM.PRIVATE),
         select: false
     },
     commentsPrivate: {
-        type: [types.COMMENT],
-        validate: validateComments(types._ACCESS_ENUM.PUBLIC),
+        type: [COMMENT],
+        validate: validateComments(POST_ACCESS_ENUM.PUBLIC),
         select: false
     }
 })
@@ -39,4 +39,4 @@ const sortByDate = function (next) {
 postSchema.pre(["find", "findById"], autoPopulate)
 postSchema.pre("find", sortByDate)
 
-module.exports = model(types.POST.ref, postSchema)
+module.exports = model(POST.ref, postSchema)

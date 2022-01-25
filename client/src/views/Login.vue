@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import actions from "../store/types/actions"
+import {LOGIN} from "../store/types/actions"
 import {mapActions} from "vuex"
 
 const defaultValue = name => ({
@@ -85,7 +85,7 @@ export default {
             })
         },
         ...mapActions({
-            loginStore: actions.LOGIN
+            loginStore: LOGIN
         })
     }
 }

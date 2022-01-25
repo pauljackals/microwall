@@ -1,28 +1,28 @@
 const {Schema, model} = require("../config/mongo")
 const passportLocalMongoose = require("passport-local-mongoose")
-const types = require("../utils/types/mongoose")
+const { USER, STRING, POST } = require("./types")
 
 const userSchema = new Schema({
-    firstName: types.STRING,
-    lastName: types.STRING,
+    firstName: STRING,
+    lastName: STRING,
     friends: {
-        type: [types.USER],
+        type: [USER],
         select: false
     },
     invitesSent: {
-        type: [types.USER],
+        type: [USER],
         select: false
     },
     invitesReceived: {
-        type: [types.USER],
+        type: [USER],
         select: false
     },
     posts: {
-        type: [types.POST]
+        type: [POST]
     }
 })
 userSchema.plugin(passportLocalMongoose, {
     populateFields: "friends invitesSent invitesReceived"
 })
 
-module.exports = model(types.USER.ref, userSchema)
+module.exports = model(USER.ref, userSchema)

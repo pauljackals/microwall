@@ -27,7 +27,7 @@ module.exports = {
         default: Date.now
     },
 
-    _ACCESS_ENUM: {
+    POST_ACCESS_ENUM: {
         PRIVATE: "PRIVATE",
         PUBLIC: "PUBLIC",
         GENERAL: "GENERAL"

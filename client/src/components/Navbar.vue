@@ -17,8 +17,8 @@
 <script>
 import LogoutButton from "./LogoutButton.vue"
 import {mapGetters, mapState} from "vuex"
-import getters from "../store/types/getters"
-import state from "../store/types/state"
+import {USER} from "../store/types/state"
+import { LOGGED_IN } from '../store/types/getters'
 
 export default {
     name: "Navbar",
@@ -27,10 +27,10 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state.USER
+            user: USER
         }),
         ...mapGetters({
-            loggedIn: getters.LOGGED_IN
+            loggedIn: LOGGED_IN
         })
     }
 }

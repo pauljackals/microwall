@@ -1,10 +1,10 @@
 const {Schema, model} = require("../config/mongo")
-const types = require("../utils/types/mongoose")
+const { STRING, USER, DATE, COMMENT } = require("./types")
 
 const commentSchema = new Schema({
-    text: types.STRING,
-    user: types.USER,
-    date: types.DATE
+    text: STRING,
+    user: USER,
+    date: DATE
 })
 
-module.exports = model(types.COMMENT.ref, commentSchema)
+module.exports = model(COMMENT.ref, commentSchema)

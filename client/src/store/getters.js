@@ -1,13 +1,13 @@
-import getters from "./types/getters"
-import stateTypes from "./types/state"
+import { FRIENDS_COMBINED, LOGGED_IN } from "./types/getters"
+import {USER} from "./types/state"
 
 export default {
-    [getters.LOGGED_IN](state) {
-        return !!Object.keys(state[stateTypes.USER]).length
+    [LOGGED_IN](state) {
+        return !!Object.keys(state[USER]).length
     },
 
-    [getters.FRIENDS_COMBINED](state) {
-        const {friends, invitesSent, invitesReceived} = state[stateTypes.USER]
+    [FRIENDS_COMBINED](state) {
+        const {friends, invitesSent, invitesReceived} = state[USER]
         return [
             ...friends,
             ...invitesSent,

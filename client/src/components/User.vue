@@ -26,10 +26,10 @@
 
 <script>
 import {mapState, mapActions, mapGetters} from "vuex"
-import state from "../store/types/state"
-import actions from "../store/types/actions"
-import getters from "../store/types/getters"
+import {USER} from "../store/types/state"
+import {INVITE_FRIEND, CANCEL_FRIEND, ACCEPT_FRIEND, DECLINE_FRIEND, REMOVE_FRIEND} from "../store/types/actions"
 import api from '../servies/api'
+import { FRIENDS_COMBINED, LOGGED_IN } from '../store/types/getters'
 
 export default {
     name: "User",
@@ -54,11 +54,11 @@ export default {
     },
     computed: {
         ...mapState({
-            user: state.USER
+            user: USER
         }),
         ...mapGetters({
-            loggedIn: getters.LOGGED_IN,
-            friendsCombined: getters.FRIENDS_COMBINED
+            loggedIn: LOGGED_IN,
+            friendsCombined: FRIENDS_COMBINED
         }),
         currentUser() {
             return this.downloadedUser ?? this.user
@@ -93,11 +93,11 @@ export default {
             this.cancelFriendAction(this.currentUser).catch(err => console.error(err))
         },
         ...mapActions({
-            inviteFriendAction: actions.INVITE_FRIEND,
-            declineFriendAction: actions.DECLINE_FRIEND,
-            acceptFriendAction: actions.ACCEPT_FRIEND,
-            removeFriendAction: actions.REMOVE_FRIEND,
-            cancelFriendAction: actions.CANCEL_FRIEND
+            inviteFriendAction: INVITE_FRIEND,
+            declineFriendAction: DECLINE_FRIEND,
+            acceptFriendAction: ACCEPT_FRIEND,
+            removeFriendAction: REMOVE_FRIEND,
+            cancelFriendAction: CANCEL_FRIEND
         }),
     }
 }

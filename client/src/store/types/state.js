@@ -1,3 +1,5 @@
-export default {
-    USER: "USER"
+const USER = "USER"
+
+export {
+    USER
 }

@@ -23,7 +23,7 @@
 
 <script>
 import {mapActions} from "vuex"
-import actions from "../../store/types/actions"
+import {UPDATE_USER_LOGIN} from "../../store/types/actions"
 
 const defaultValue = (name, type="text", value=undefined) => ({
     name,
@@ -93,7 +93,7 @@ export default {
                 })
         },
         ...mapActions({
-            updateUserLogin: actions.UPDATE_USER_LOGIN
+            updateUserLogin: UPDATE_USER_LOGIN
         })
     }
 }
