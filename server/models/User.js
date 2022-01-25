@@ -16,10 +16,13 @@ const userSchema = new Schema({
     invitesReceived: {
         type: [types.USER],
         select: false
+    },
+    posts: {
+        type: [types.POST]
     }
 })
 userSchema.plugin(passportLocalMongoose, {
     populateFields: "friends invitesSent invitesReceived"
 })
 
-module.exports = model("User", userSchema)
+module.exports = model(types.USER.ref, userSchema)

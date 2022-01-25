@@ -102,3 +102,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+a {
+    display: block;
+}
+</style>

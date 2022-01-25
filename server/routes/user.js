@@ -1,7 +1,6 @@
 const User = require("../models/User")
 const authenticationCheck = require("../utils/authenticationCheck")
 const router = require("express").Router()
-const mongoose = require("../config/mongo")
 
 const {
     NotFoundError,

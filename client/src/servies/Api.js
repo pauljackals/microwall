@@ -1,9 +1,11 @@
 import axios from "axios"
 
 axios.defaults.baseURL = "http://localhost:5000"
+axios.defaults.withCredentials = true
+axios.defaults.credentials = "include"
 const authenticationConfig = {
-    withCredentials: true,
-    credentials: "include"
+    // withCredentials: true,
+    // credentials: "include"
 }
 
 export default {
@@ -61,5 +63,9 @@ export default {
     },
     cancelFriend(_id) {
         return axios.patch(`/user/${_id}/friend/cancel`, {}, authenticationConfig)
+    },
+
+    getPosts() {
+        return axios.get("/post", authenticationConfig)
     }
 }

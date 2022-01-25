@@ -12,7 +12,7 @@ export default {
         logout() {
             this.logoutStore().then(() => {
                 this.$router.push({
-                    name: 'Home'
+                    name: 'Login'
                 })
 
             }).catch(error => {
