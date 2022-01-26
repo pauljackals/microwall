@@ -55,11 +55,20 @@ router.get("/", (req, res, next) => {
 
 router.get("/:id", (req, res, next) => {
     const {id} = req.params
-    User.findById(id).select("+friends").populate({path:"posts", options:{sort:{date:1}}}).exec().then(user => {
+    const select = req.isAuthenticated() ? {select: "+commentsPublic +commentsPrivate"} : {}
+
+    User.findById(id).select(`+friends`).populate({path:"posts", options:{sort:{date:1}}, ...select}).exec().then(user => {
         if(!user) {
             return next(new NotFoundError())
         }
         user.posts = user.posts.filter(post => post.access!==POST_ACCESS_ENUM.PRIVATE || req.isAuthenticated() && user.friends.includes(req.user.id))
+        if(req.isAuthenticated()) {
+            user.posts.forEach(post => {
+                if(post.access===POST_ACCESS_ENUM.GENERAL && post.user._id.toString()!==req.user._id.toString() && !req.user.friends.some(friend => friend._id.toString()===post.user._id.toString())){
+                    post.commentsPrivate = undefined
+                }
+            })
+        }
         user.friends = undefined
         res.status(200).json({user})
 

@@ -5,18 +5,26 @@ const authenticationCheck = require("../utils/authenticationCheck")
 const { POST_ACCESS_ENUM } = require("../models/types")
 
 router.get("/", (req, res, next) => {
+    const isAuthenticated = req.isAuthenticated()
     const notPrivatePosts = {access: {$ne: POST_ACCESS_ENUM.PRIVATE}}
 
-    const query = req.isAuthenticated() ? Post.find({$or: [
+    const query = isAuthenticated ? Post.find({$or: [
         notPrivatePosts,
         {
             access: POST_ACCESS_ENUM.PRIVATE,
             user: {$in: [req.user._id, ...req.user.friends.map(friend => friend._id)]}
         }
     
-    ]}).populate("commentsPublic commentsPrivate") : Post.find(notPrivatePosts)
+    ]}).select("+commentsPublic +commentsPrivate") : Post.find(notPrivatePosts)
 
     query.exec().then(posts => {
+        if(isAuthenticated) {
+            posts.forEach(post => {
+                if(post.access===POST_ACCESS_ENUM.GENERAL && post.user._id.toString()!==req.user._id.toString() && !req.user.friends.includes(post.user._id)){
+                    post.commentsPrivate = undefined
+                }
+            })
+        }
         res.status(200).json({posts})
 
     }).catch(err => next(err))

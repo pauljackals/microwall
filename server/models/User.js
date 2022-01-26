@@ -24,7 +24,7 @@ const userSchema = new Schema({
 })
 
 userSchema.plugin(passportLocalMongoose, {
-    populateFields: {path: "friends invitesSent invitesReceived posts", options: {sort:{"posts.date":1}}}
+    populateFields: {path: "friends invitesSent invitesReceived posts", options: {sort:{"posts.date":1}}, select:"+commentsPublic +commentsPrivate"}
 })
 
 module.exports = model(USER.ref, userSchema)

@@ -1,19 +1,14 @@
 <template>
     <div>
         <h1>home</h1>
-        <ul>
-            <li v-for="post in posts" :key="post._id" style="margin-bottom: 10px">
-                <div>{{(new Date(post.date)).toLocaleString()}}</div>
-                <div>{{post.user.username}}</div>
-                <div>{{post.access}}</div>
-                <div>{{post.text}}</div>
-            </li>
-        </ul>
+        <PostList :posts="posts" :isPrivate="-1"/>
     </div>
 </template>
 
 <script>
 import api from "../servies/api"
+import PostList from "../components/post/PostList.vue"
+
 export default {
     data(){
         return {
@@ -25,6 +20,9 @@ export default {
             this.posts = response.data.posts
         
         }).catch(err => console.error(err))
+    },
+    components: {
+        PostList
     }
 }
 </script>

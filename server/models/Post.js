@@ -4,7 +4,7 @@ const { STRING, USER, DATE, POST_ACCESS_ENUM, POST, COMMENT } = require("./types
 require("./Comment")
 
 const validateComments = postAccess => function(comments) {
-    return this.access!==postAccess || !comments.length
+    return this.access===postAccess && !comments || !!comments
 }
 
 const postSchema = new Schema({
@@ -19,12 +19,18 @@ const postSchema = new Schema({
     commentsPublic: {
         type: [COMMENT],
         validate: validateComments(POST_ACCESS_ENUM.PRIVATE),
-        select: false
+        select: false,
+        default() {
+            return this.access!==POST_ACCESS_ENUM.PRIVATE ? [] : undefined
+        }
     },
     commentsPrivate: {
         type: [COMMENT],
         validate: validateComments(POST_ACCESS_ENUM.PUBLIC),
-        select: false
+        select: false,
+        default() {
+            return this.access!==POST_ACCESS_ENUM.PUBLIC ? [] : undefined
+        }
     }
 })
 

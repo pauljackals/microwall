@@ -56,7 +56,7 @@ const routes = [
                 component: Wall,
                 name: "WallPublic",
                 props: {
-                    isPrivate: false
+                    isPrivate: 0
                 }
             },
             {
@@ -64,7 +64,7 @@ const routes = [
                 component: Wall,
                 name: "WallPrivate",
                 props: {
-                    isPrivate: true
+                    isPrivate: 1
                 }
             }
         ]
