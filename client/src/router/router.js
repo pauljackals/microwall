@@ -10,6 +10,7 @@ import Users from "../views/Users.vue"
 import Friends from "../views/Friends.vue"
 import Wall from "../components/Wall.vue"
 import PostNew from "../views/post/New.vue"
+import Post from "../views/post/Post.vue"
 
 const routes = [
     {
@@ -80,6 +81,12 @@ const routes = [
         path: "/post/add",
         component: PostNew,
         name: "PostNew"
+    },
+    {
+        path: "/post/:id/:access(public|private)?",
+        component: Post,
+        name: "Post",
+        props: true
     },
 
     {

@@ -3,8 +3,8 @@
         <router-link :to="{name: 'Home'}">home</router-link>
         <router-link :to="{name: 'Users'}">users</router-link>
         <div class="wrapper-inline" v-if="!loggedIn">
-            <router-link :to="{name: 'Register'}">register</router-link>
             <router-link :to="{name: 'Login'}">login</router-link>
+            <router-link :to="{name: 'Register'}">register</router-link>
         </div>
         <div class="wrapper-inline" v-else>
             <router-link :to="{name: 'Friends'}">friends</router-link>

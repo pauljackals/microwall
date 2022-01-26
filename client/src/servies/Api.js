@@ -68,5 +68,8 @@ export default {
         return axios.post("/post", {
             text, access, links, images
         })
+    },
+    getPost(_id, isPrivate) {
+        return axios.get(`/post/${_id}`, {params: {isPrivate}})
     }
 }

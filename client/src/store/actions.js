@@ -9,9 +9,10 @@ import {
     REMOVE_FRIEND,
     ACCEPT_FRIEND,
     CANCEL_FRIEND,
-    ADD_POST
+    ADD_POST,
+    GET_POST
 } from "./types/actions"
-import { CLEAR_USER, SET_USER, UPDATE_USER } from "./types/mutations"
+import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER } from "./types/mutations"
 import api from "../servies/api"
 import {USER} from "./types/state"
 
@@ -25,7 +26,8 @@ export default {
             password
 
         ).then(response => {
-            commit(SET_USER, response.data.user)
+            const {user} = response.data
+            commit(SET_USER, {user})
         })
     },
 
@@ -37,7 +39,8 @@ export default {
 
     [GET_USER_DATA]({commit}) {
         return api.getUserData().then(response => {
-            commit(SET_USER, response.data.user)
+            const {user} = response.data
+            commit(SET_USER, {user})
         })
     },
 
@@ -111,6 +114,13 @@ export default {
             commit(UPDATE_USER, {
                 posts: [response.data.post, ...state[USER].posts]
             })
+        })
+    },
+
+    [GET_POST]({commit}, {_id, isPrivate}) {
+        return api.getPost(_id, isPrivate).then(response => {
+            const {post} = response.data
+            commit(SET_CURRENT_POST, {post})
         })
     }
 }
