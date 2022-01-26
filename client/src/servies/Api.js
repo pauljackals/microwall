@@ -64,9 +64,9 @@ export default {
     getPosts() {
         return axios.get("/post")
     },
-    addPost(text, access) {
+    addPost(text, access, links, images) {
         return axios.post("/post", {
-            text, access
+            text, access, links, images
         })
     }
 }

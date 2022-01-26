@@ -4,6 +4,12 @@
         <div>{{post.user.username}}</div>
         <div>{{post.access}}</div>
         <div class="multiline">{{post.text}}</div>
+        <ul>
+            <li v-for="(link, index) in post.links" :key="index"><a :href="link">{{link}}</a></li>
+        </ul>
+        <ul>
+            <li v-for="(image, index) in post.images" :key="index"><img :src="image"></li>
+        </ul>
         <div v-if="!details && loggedIn">
             <div v-if="isPrivate===-1">
                 <div v-if="post.commentsPublic">{{post.commentsPublic.length}} public comments</div>

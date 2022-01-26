@@ -106,8 +106,8 @@ export default {
         })
     },
 
-    [ADD_POST]({commit, state}, {text, access}) {
-        return api.addPost(text, access).then(response => {
+    [ADD_POST]({commit, state}, {text, access, links, images}) {
+        return api.addPost(text, access, links, images).then(response => {
             commit(UPDATE_USER, {
                 posts: [response.data.post, ...state[USER].posts]
             })

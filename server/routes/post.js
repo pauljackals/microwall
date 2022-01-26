@@ -31,10 +31,10 @@ router.get("/", (req, res, next) => {
 })
 
 router.post("/", authenticationCheck, (req, res, next) => {
-    const {text, access} = req.body
+    const {text, access, links, images} = req.body
     const userId = req.user._id
 
-    const post = new Post({text, access, user: userId})
+    const post = new Post({text, access, user: userId, links, images})
     post.save().then(post => {
         User.findByIdAndUpdate(userId, {$push: {
             posts: post._id

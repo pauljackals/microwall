@@ -1,6 +1,6 @@
 <template>
     <ul>
-        <Post v-for="post in posts" :key="post._id" :post="post" :isPrivate="isPrivate" style="margin-bottom: 10px"/>
+        <Post v-for="post in posts" :key="post._id" :post="post" :isPrivate="isPrivate" :details="false" style="margin-bottom: 10px"/>
     </ul>
 </template>
 

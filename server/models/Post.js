@@ -6,6 +6,13 @@ require("./Comment")
 const validateComments = postAccess => function(comments) {
     return this.access===postAccess && !comments || !!comments
 }
+const validateUrl = url => {
+    try {
+        return !!(new URL(url))
+    } catch(err) {
+        return false
+    }
+}
 
 const postSchema = new Schema({
     text: STRING,
@@ -31,6 +38,18 @@ const postSchema = new Schema({
         default() {
             return this.access!==POST_ACCESS_ENUM.PUBLIC ? [] : undefined
         }
+    },
+    links: {
+        type: [{
+            ...STRING,
+            validate: validateUrl
+        }]
+    },
+    images: {
+        type: [{
+            ...STRING,
+            validate: validateUrl
+        }]
     }
 })
 
