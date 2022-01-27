@@ -4,17 +4,14 @@ if(isDevelopment) {
 }
 
 const express = require("express")
-const http = require("http")
-const expressSession = require("express-session")
+const app = require("./config/express")
+const server = require("./config/server")
+const expressSession = require("./config/session")
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const passport = require("passport")
-const mongoStore = require("./config/mongoStore")
 const router = require("./routes/router")
 const errorHandler = require("./utils/errorHandler")
-
-const app = express()
-const server = http.createServer(app)
 
 app.use(express.urlencoded({
     extended: false
@@ -25,12 +22,8 @@ app.use(cors({
     credentials: true,
     origin: "http://localhost:8080"
 }))
-app.use(expressSession({
-    secret: process.env.SERVER_SESSION_SECRET,
-    saveUninitialized: false,
-    resave: false,
-    store: mongoStore,
-}))
+
+app.use(expressSession)
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -39,6 +32,8 @@ const User = require("./models/User")
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
+
+require("./namespaces/namespaces")
 
 app.use(router)
 app.use(errorHandler)

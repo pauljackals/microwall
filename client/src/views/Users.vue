@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import api from "../servies/api"
+import api from "../services/api"
 import UserList from "../components/UserList.vue"
 
 export default {

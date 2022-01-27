@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import api from "../servies/api"
+import api from "../services/api"
 import PostList from "../components/post/PostList.vue"
 
 export default {

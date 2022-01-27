@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import api from "../servies/api"
+import api from "../services/api"
 
 const defaultValue = (name, type="text", exclude) => ({
     name,

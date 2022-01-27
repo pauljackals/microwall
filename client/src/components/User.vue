@@ -32,7 +32,7 @@
 import {mapState, mapActions, mapGetters} from "vuex"
 import {USER} from "../store/types/state"
 import {INVITE_FRIEND, CANCEL_FRIEND, ACCEPT_FRIEND, DECLINE_FRIEND, REMOVE_FRIEND} from "../store/types/actions"
-import api from '../servies/api'
+import api from '../services/api'
 import { FRIENDS_COMBINED, LOGGED_IN } from '../store/types/getters'
 
 export default {

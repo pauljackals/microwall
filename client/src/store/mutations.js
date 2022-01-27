@@ -1,5 +1,5 @@
-import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER } from "./types/mutations"
-import {CURRENT_POST, USER} from "./types/state"
+import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET } from "./types/mutations"
+import {CURRENT_POST, USER, USER_SOCKET} from "./types/state"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
 export default {
@@ -14,6 +14,9 @@ export default {
             ...state[USER],
             ...payload
         }
+    },
+    [SET_USER_SOCKET](state, {socket}) {
+        state[USER_SOCKET] = socket
     },
     [ADD_COMMENT_TO_USER](state, {comment}) {
         state[USER].posts.forEach(post => {

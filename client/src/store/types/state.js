@@ -1,7 +1,9 @@
 const USER = "USER"
+const USER_SOCKET = "USER_SOCKET"
 const CURRENT_POST = "CURRENT_POST"
 
 export {
     USER,
-    CURRENT_POST
+    CURRENT_POST,
+    USER_SOCKET
 }

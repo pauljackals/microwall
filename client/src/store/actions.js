@@ -13,9 +13,10 @@ import {
     GET_POST,
     COMMENT_CURRENT_POST
 } from "./types/actions"
-import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER } from "./types/mutations"
-import api from "../servies/api"
-import {USER} from "./types/state"
+import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, SET_CURRENT_POST, SET_USER, SET_USER_SOCKET, UPDATE_USER } from "./types/mutations"
+import api from "../services/api"
+import {USER, USER_SOCKET} from "./types/state"
+import sio from "../services/sio"
 
 export default {
     [LOGIN]({commit}, {
@@ -29,12 +30,17 @@ export default {
         ).then(response => {
             const {user} = response.data
             commit(SET_USER, {user})
+
+            const socket = sio.listenToUser(user._id)
+            commit(SET_USER_SOCKET, {socket})
         })
     },
 
-    [LOGOUT]({commit}) {
+    [LOGOUT]({commit, state}) {
         return api.logout().then(() => {
             commit(CLEAR_USER)
+            state[USER_SOCKET].close()
+            commit(SET_USER_SOCKET, {socket: null})
         })
     },
 
@@ -42,6 +48,9 @@ export default {
         return api.getUserData().then(response => {
             const {user} = response.data
             commit(SET_USER, {user})
+
+            const socket = sio.listenToUser(user._id)
+            commit(SET_USER_SOCKET, {socket})
         })
     },
 
