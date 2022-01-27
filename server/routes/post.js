@@ -98,7 +98,7 @@ router.post("/:id", authenticationCheck, (req, res, next) => {
 
     const isPrivateRaw = req.query.isPrivate
     if(!["true", "false", undefined].includes(isPrivateRaw)) {
-        return next(new Error())
+        return next(new NotFoundError())
     }
     const isPrivate = !isPrivateRaw ? undefined : !!(isPrivateRaw==="true")
 
@@ -131,10 +131,10 @@ router.post("/:id", authenticationCheck, (req, res, next) => {
                 post.commentsPublic.unshift(comment._id)
             }
             post.save().then(() => {
-                comment.isPrivate = isPrivate
                 if(req.user._id.toString()!==post.user._id.toString()) {
-                    sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment}))
+                    sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
                 }
+                sio.ofWrapped(`/post/${post._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
                 res.status(201).json({comment})
             })
         })

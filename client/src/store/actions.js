@@ -13,7 +13,7 @@ import {
     GET_POST,
     COMMENT_CURRENT_POST
 } from "./types/actions"
-import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, SET_CURRENT_POST, SET_USER, SET_USER_SOCKET, UPDATE_USER } from "./types/mutations"
+import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, SET_CURRENT_POST, SET_CURRENT_POST_SOCKET, SET_USER, SET_USER_SOCKET, UPDATE_USER } from "./types/mutations"
 import api from "../services/api"
 import {USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
@@ -22,8 +22,8 @@ const listenToUser = (commit, id) => {
     const socket = sio.listenToUser(id)
 
     socket.on("comment", payloadRaw => {
-        const {comment} = JSON.parse(payloadRaw)
-        commit(ADD_COMMENT_TO_USER, {comment})
+        const {comment, isPrivate} = JSON.parse(payloadRaw)
+        commit(ADD_COMMENT_TO_USER, {comment, isPrivate})
     })
 
     return socket
@@ -138,10 +138,19 @@ export default {
         })
     },
 
-    [GET_POST]({commit}, {_id, isPrivate}) {
+    [GET_POST]({commit, state}, {_id, isPrivate}) {
         return api.getPost(_id, isPrivate).then(response => {
             const {post} = response.data
             commit(SET_CURRENT_POST, {post})
+            
+            const socket = sio.listenToPost(post._id, isPrivate)
+            socket.on("comment", payloadRaw => {
+                const {comment} = JSON.parse(payloadRaw)
+                if(comment.user._id!==state[USER]._id) {
+                    commit(ADD_COMMENT_TO_CURRENT_POST, {comment})
+                }
+            })
+            commit(SET_CURRENT_POST_SOCKET, {socket})
         })
     },
 
@@ -150,7 +159,7 @@ export default {
             const {comment} = response.data
             commit(ADD_COMMENT_TO_CURRENT_POST, {comment})
             if(state[USER]._id===comment.user._id) {
-                commit(ADD_COMMENT_TO_USER, {comment})
+                commit(ADD_COMMENT_TO_USER, {comment, isPrivate})
             }
         })
     }

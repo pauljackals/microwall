@@ -1,5 +1,5 @@
-import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET } from "./types/mutations"
-import {CURRENT_POST, USER, USER_SOCKET} from "./types/state"
+import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, SET_CURRENT_POST_SOCKET } from "./types/mutations"
+import {CURRENT_POST, CURRENT_POST_SOCKET, USER, USER_SOCKET} from "./types/state"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
 export default {
@@ -18,11 +18,11 @@ export default {
     [SET_USER_SOCKET](state, {socket}) {
         state[USER_SOCKET] = socket
     },
-    [ADD_COMMENT_TO_USER](state, {comment}) {
+    [ADD_COMMENT_TO_USER](state, {comment, isPrivate}) {
         state[USER].posts.forEach(post => {
             if(post._id===comment.post) {
                 if(post.access===POST_ACCESS_ENUM.GENERAL) {
-                    const comments = comment.isPrivate ? post.commentsPrivate : post.commentsPublic
+                    const comments = isPrivate ? post.commentsPrivate : post.commentsPublic
                     comments.unshift(comment._id)
                 } else {
                     const comments = post.commentsPublic ?? post.commentsPrivate
@@ -37,6 +37,11 @@ export default {
     },
     [CLEAR_CURRENT_POST](state) {
         state[CURRENT_POST] = {}
+        state[CURRENT_POST_SOCKET].close()
+        state[CURRENT_POST_SOCKET] = null
+    },
+    [SET_CURRENT_POST_SOCKET](state, {socket}) {
+        state[CURRENT_POST_SOCKET] = socket
     },
     [ADD_COMMENT_TO_CURRENT_POST](state, {comment}) {
         const currentPost = state[CURRENT_POST]
