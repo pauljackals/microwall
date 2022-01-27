@@ -18,6 +18,17 @@ import api from "../services/api"
 import {USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
 
+const listenToUser = (commit, id) => {
+    const socket = sio.listenToUser(id)
+
+    socket.on("comment", payloadRaw => {
+        const {comment} = JSON.parse(payloadRaw)
+        commit(ADD_COMMENT_TO_USER, {comment})
+    })
+
+    return socket
+}
+
 export default {
     [LOGIN]({commit}, {
         username,
@@ -31,7 +42,7 @@ export default {
             const {user} = response.data
             commit(SET_USER, {user})
 
-            const socket = sio.listenToUser(user._id)
+            const socket = listenToUser(commit, user._id)
             commit(SET_USER_SOCKET, {socket})
         })
     },
@@ -49,7 +60,7 @@ export default {
             const {user} = response.data
             commit(SET_USER, {user})
 
-            const socket = sio.listenToUser(user._id)
+            const socket = listenToUser(commit, user._id)
             commit(SET_USER_SOCKET, {socket})
         })
     },

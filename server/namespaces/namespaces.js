@@ -14,3 +14,5 @@ sio.ofWrapped(/^\/user\/[a-fA-F0-9]{24}$/).use((socket, next) => {
         console.log(`${socket.request.user.username} disconnected`);
     })
 })
+
+module.exports = sio

@@ -33,7 +33,7 @@ passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
-require("./namespaces/namespaces")
+// require("./namespaces/namespaces")
 
 app.use(router)
 app.use(errorHandler)

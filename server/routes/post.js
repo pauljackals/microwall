@@ -5,6 +5,7 @@ const authenticationCheck = require("../utils/authenticationCheck")
 const { POST_ACCESS_ENUM } = require("../models/types")
 const {NotFoundError} = require("../utils/errors")
 const Comment = require("../models/Comment")
+const sio = require("../namespaces/namespaces")
 
 router.get("/", (req, res, next) => {
     const isAuthenticated = req.isAuthenticated()
@@ -131,6 +132,9 @@ router.post("/:id", authenticationCheck, (req, res, next) => {
             }
             post.save().then(() => {
                 comment.isPrivate = isPrivate
+                if(req.user._id.toString()!==post.user._id.toString()) {
+                    sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment}))
+                }
                 res.status(201).json({comment})
             })
         })
