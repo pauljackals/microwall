@@ -24,7 +24,7 @@
         </div>
         <router-link :to="{name: 'WallPublic'}">public wall</router-link>
         <router-link v-if="loggedIn && (!downloadedUser || canRemove)" :to="{name: 'WallPrivate'}">private wall</router-link>
-        <router-view :key="$route.fullPath" :user="currentUser"/>
+        <router-view v-if="checked" :key="$route.fullPath" :user="currentUser"/>
     </div>
 </template>
 
@@ -45,26 +45,31 @@ export default {
     },
     data() {
         return {
-            downloadedUser: null
+            downloadedUser: null,
+            checked: false
         }
     },
     created(){
         if(this.user._id===this.id) {
+            console.log("test");
             this.$router.replace({
                 name: "Profile",
                 params: {id: "me"}
             })
-            return
-        }
-        if(this.id !== "me") {
+
+        } else if(this.id !== "me") {
             this.downloadedUser = {}
             api.getUser(this.id).then(response => {
                 this.downloadedUser = response.data.user
+                this.checked = true
             
             }).catch(() => this.$router.replace({
                 name: "NotFound",
                 params: {path: this.$route.fullPath.slice(1).split("/")}
             }))
+            
+        } else {
+            this.checked = true
         }
     },
     computed: {

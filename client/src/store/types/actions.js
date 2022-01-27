@@ -12,6 +12,7 @@ const CANCEL_FRIEND = "CANCEL_FRIEND"
 
 const ADD_POST = "ADD_POST"
 const GET_POST = "GET_POST"
+const COMMENT_CURRENT_POST = "COMMENT_CURRENT_POST"
 
 export {
     LOGIN,
@@ -27,5 +28,6 @@ export {
     CANCEL_FRIEND,
 
     ADD_POST,
-    GET_POST
+    GET_POST,
+    COMMENT_CURRENT_POST
 }

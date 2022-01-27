@@ -71,5 +71,8 @@ export default {
     },
     getPost(_id, isPrivate) {
         return axios.get(`/post/${_id}`, {params: {isPrivate}})
+    },
+    addComment(_id, text, isPrivate) {
+        return axios.post(`/post/${_id}`, {text}, {params: {isPrivate}})
     }
 }

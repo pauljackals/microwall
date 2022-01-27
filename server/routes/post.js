@@ -122,7 +122,7 @@ router.post("/:id", authenticationCheck, (req, res, next) => {
         if(!post || post.access===POST_ACCESS_ENUM.GENERAL && isPrivate===undefined) {
             throw new NotFoundError()
         }
-        const comment = new Comment({text, user: req.user._id})
+        const comment = new Comment({text, user: req.user._id, post: id})
         comment.save().then(comment => {
             if(post.access===POST_ACCESS_ENUM.PRIVATE || post.access===POST_ACCESS_ENUM.GENERAL && isPrivate) {
                 post.commentsPrivate.unshift(comment._id)
@@ -130,6 +130,7 @@ router.post("/:id", authenticationCheck, (req, res, next) => {
                 post.commentsPublic.unshift(comment._id)
             }
             post.save().then(() => {
+                comment.isPrivate = isPrivate
                 res.status(201).json({comment})
             })
         })

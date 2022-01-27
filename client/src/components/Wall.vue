@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>{{isPrivate ? "private" : "public"}} wall</h2>
-        <PostList :posts="posts"/>
+        <PostList :posts="posts" :isPrivate="isPrivate"/>
     </div>
 </template>
 
@@ -37,6 +37,7 @@ export default {
     },
     created() {
         if(this.isPrivate===1 && !(this.loggedIn && this.userStore._id===this.user._id || this.userStore.friends.some(friend => friend._id===this.user._id))) {
+            console.log(this.userStore._id, this.user._id);
             this.$router.replace({name: "WallPublic"})
         }
     },

@@ -10,9 +10,10 @@ import {
     ACCEPT_FRIEND,
     CANCEL_FRIEND,
     ADD_POST,
-    GET_POST
+    GET_POST,
+    COMMENT_CURRENT_POST
 } from "./types/actions"
-import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER } from "./types/mutations"
+import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER } from "./types/mutations"
 import api from "../servies/api"
 import {USER} from "./types/state"
 
@@ -121,6 +122,16 @@ export default {
         return api.getPost(_id, isPrivate).then(response => {
             const {post} = response.data
             commit(SET_CURRENT_POST, {post})
+        })
+    },
+
+    [COMMENT_CURRENT_POST]({commit, state}, {_id, text, isPrivate}) {
+        return api.addComment(_id, text, isPrivate).then(response => {
+            const {comment} = response.data
+            commit(ADD_COMMENT_TO_CURRENT_POST, {comment})
+            if(state[USER]._id===comment.user._id) {
+                commit(ADD_COMMENT_TO_USER, {comment})
+            }
         })
     }
 }
