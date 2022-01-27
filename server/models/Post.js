@@ -1,8 +1,6 @@
 const {Schema, model} = require("../config/mongo")
 const { STRING, USER, DATE, POST_ACCESS_ENUM, POST, COMMENT } = require("./types")
 
-require("./Comment")
-
 const validateComments = postAccess => function(comments) {
     return this.access===postAccess && !comments || !!comments
 }

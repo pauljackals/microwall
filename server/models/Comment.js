@@ -7,4 +7,10 @@ const commentSchema = new Schema({
     date: DATE
 })
 
+const autoPopulate = function (next) {
+    this.populate("user")
+    next()
+}
+commentSchema.pre(["find", "findOne"], autoPopulate)
+
 module.exports = model(COMMENT.ref, commentSchema)

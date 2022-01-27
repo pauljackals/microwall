@@ -1,7 +1,7 @@
 <template>
     <div>
         <h2>{{isPrivate ? "private" : "public"}} wall</h2>
-        <PostList :posts="posts" :isPrivate="isPrivate"/>
+        <PostList :posts="posts"/>
     </div>
 </template>
 

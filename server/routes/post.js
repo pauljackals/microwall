@@ -4,6 +4,7 @@ const User = require("../models/User")
 const authenticationCheck = require("../utils/authenticationCheck")
 const { POST_ACCESS_ENUM } = require("../models/types")
 const {NotFoundError} = require("../utils/errors")
+const Comment = require("../models/Comment")
 
 router.get("/", (req, res, next) => {
     const isAuthenticated = req.isAuthenticated()
@@ -87,6 +88,52 @@ router.get("/:id", authenticationCheck, (req, res, next) => {
         }
         res.status(200).json({post})
     
+    }).catch(err => next(err))
+})
+
+router.post("/:id", authenticationCheck, (req, res, next) => {
+    const {id} = req.params
+    const {text} = req.body
+
+    const isPrivateRaw = req.query.isPrivate
+    if(!["true", "false", undefined].includes(isPrivateRaw)) {
+        return next(new Error())
+    }
+    const isPrivate = !isPrivateRaw ? undefined : !!(isPrivateRaw==="true")
+
+    Post.findOne({$or: [
+        {
+            _id: id,
+            access: {$in: [
+                POST_ACCESS_ENUM.PUBLIC,
+                ...(!isPrivate ? [POST_ACCESS_ENUM.GENERAL] : [])
+            ]}
+        },
+        {
+            _id: id,
+            access: {$in: [
+                POST_ACCESS_ENUM.PRIVATE,
+                ...(isPrivate ? [POST_ACCESS_ENUM.GENERAL] : [])
+            ]},
+            user: {$in: [req.user._id, ...req.user.friends.map(friend => friend._id)]}
+        }
+
+    ]}).populate("commentsPublic commentsPrivate").exec().then(post => {
+        if(!post || post.access===POST_ACCESS_ENUM.GENERAL && isPrivate===undefined) {
+            throw new NotFoundError()
+        }
+        const comment = new Comment({text, user: req.user._id})
+        comment.save().then(comment => {
+            if(post.access===POST_ACCESS_ENUM.PRIVATE || post.access===POST_ACCESS_ENUM.GENERAL && isPrivate) {
+                post.commentsPrivate.unshift(comment._id)
+            } else {
+                post.commentsPublic.unshift(comment._id)
+            }
+            post.save().then(() => {
+                res.status(201).json({comment})
+            })
+        })
+
     }).catch(err => next(err))
 })
 

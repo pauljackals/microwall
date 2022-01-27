@@ -1,12 +1,18 @@
 <template>
     <div>
         <h1>post</h1>
-        <Post :post="post" :details="true" :isPrivate="-1"/>
+        <Post :post="post"/>
+        <ul>
+            <li v-for="comment in (post.commentsPublic ?? post.commentsPrivate)"  :key="comment._id">
+                <Comment :comment="comment"/>
+            </li>
+        </ul>
     </div>
 </template>
 
 <script>
 import Post from "../../components/post/Post.vue"
+import Comment from "../../components/Comment.vue"
 import {mapActions, mapState, mapMutations} from "vuex"
 import { CURRENT_POST } from '../../store/types/state'
 import { GET_POST } from '../../store/types/actions'
@@ -14,7 +20,8 @@ import { CLEAR_CURRENT_POST } from '../../store/types/mutations'
 
 export default {
     components: {
-        Post
+        Post,
+        Comment
     },
     computed: {
         ...mapState({
