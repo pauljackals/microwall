@@ -1,5 +1,5 @@
 const isDevelopment = require("./config/isDevelopment")
-if(isDevelopment) {
+if(isDevelopment || true) { // change when docker ready
     require("dotenv").config({path: "../.env"})
 }
 
@@ -13,6 +13,11 @@ const passport = require("passport")
 const router = require("./routes/router")
 const errorHandler = require("./utils/errorHandler")
 
+if(!isDevelopment) {
+    const history = require('connect-history-api-fallback')
+    app.use(history())
+    app.use(express.static("./dist"))
+}
 app.use(express.urlencoded({
     extended: false
 }))
@@ -20,7 +25,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
     credentials: true,
-    origin: "http://localhost:8080"
+    origin: isDevelopment ? `http://localhost:${process.env.CLIENT_PORT || 8080}` : undefined
 }))
 
 app.use(expressSession)
@@ -33,12 +38,14 @@ passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
-// require("./namespaces/namespaces")
-
-app.use(router)
+if(isDevelopment) {
+    app.use(router)
+} else {
+    app.use("/api", router)
+}
 app.use(errorHandler)
 
-const port = process.env.SERVER_PORT || 5000
+const port = process.env.SERVER_PORT || (isDevelopment ? 5000 : 443)
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 })

@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "connect-history-api-fallback": "^1.6.0",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -22,6 +23,7 @@
   },
   "scripts": {
     "start": "nodemon",
-    "production": "node index.js"
+    "production": "NODE_ENV=production node index.js",
+    "production_win": "set \"NODE_ENV=production\" && node index.js"
   }
 }

@@ -1,6 +1,7 @@
 import {io} from "socket.io-client"
+import isDevelopment from "../utils/isDevelopment"
 
-const baseURL = "http://localhost:5000"
+const baseURL = isDevelopment ? `http://localhost:5000` : ''
 
 export default {
     listenToUser(id) {

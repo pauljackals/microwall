@@ -1,6 +1,7 @@
 import axios from "axios"
+import isDevelopment from "../utils/isDevelopment"
 
-axios.defaults.baseURL = "http://localhost:5000"
+axios.defaults.baseURL = isDevelopment ? `http://localhost:5000` : "/api"
 axios.defaults.withCredentials = true
 axios.defaults.credentials = "include"
 

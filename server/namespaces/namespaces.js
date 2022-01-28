@@ -44,12 +44,5 @@ sio.ofWrapped(/^\/post\/[a-fA-F0-9]{24}$/).use((socket, next) => {
     
     }).catch(err => next(err))
 })
-.on("connection", socket => {
-    console.log(`${socket.request.user.username} connected`);
-
-    socket.on("disconnect", () => {
-        console.log(`${socket.request.user.username} disconnected`);
-    })
-})
 
 module.exports = sio
