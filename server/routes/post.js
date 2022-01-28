@@ -55,7 +55,7 @@ router.get("/:id", authenticationCheck, (req, res, next) => {
 
     const isPrivateRaw = req.query.isPrivate
     if(!["true", "false", undefined].includes(isPrivateRaw)) {
-        return next(new Error())
+        return next(new NotFoundError())
     }
     const isPrivate = !isPrivateRaw ? undefined : !!(isPrivateRaw==="true")
 

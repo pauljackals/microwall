@@ -8,7 +8,7 @@ export default {
         return sio
     },
     listenToPost(id, isPrivate) {
-        const sio = io(`${baseURL}/post/${id}`, {withCredentials: true, query: {isPrivate}})
+        const sio = io(`${baseURL}/post/${id}`, {withCredentials: true, auth: {isPrivate}})
         return sio
     }
 }

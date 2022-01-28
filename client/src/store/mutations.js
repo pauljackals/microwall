@@ -37,8 +37,10 @@ export default {
     },
     [CLEAR_CURRENT_POST](state) {
         state[CURRENT_POST] = {}
-        state[CURRENT_POST_SOCKET].close()
-        state[CURRENT_POST_SOCKET] = null
+        if(state[CURRENT_POST_SOCKET]) {
+            state[CURRENT_POST_SOCKET].close()
+            state[CURRENT_POST_SOCKET] = null
+        }
     },
     [SET_CURRENT_POST_SOCKET](state, {socket}) {
         state[CURRENT_POST_SOCKET] = socket

@@ -51,7 +51,6 @@ export default {
     },
     created(){
         if(this.user._id===this.id) {
-            console.log("test");
             this.$router.replace({
                 name: "Profile",
                 params: {id: "me"}
