@@ -1,14 +1,14 @@
 <template>
     <div>
-        <h1>add post</h1>
+        <h1 class="title has-text-centered">add post</h1>
         <form @submit.prevent="add">
-            <textarea placeholder="text" v-model="post.text"></textarea>
-            <select v-model="post.access">
+            <textarea placeholder="text" v-model="post.text" class="textarea has-fixed-size"></textarea>
+            <select v-model="post.access" class="select is-normal">
                 <option v-for="access in postAccessEnumValues" :key="access" :value="access">{{access}}</option>
             </select>
-            <textarea placeholder="links" v-model="post.links"></textarea>
-            <textarea placeholder="images" v-model="post.images"></textarea>
-            <input type="submit" value="add">
+            <textarea placeholder="links" v-model="post.links" class="textarea has-fixed-size"></textarea>
+            <textarea placeholder="images" v-model="post.images" class="textarea has-fixed-size"></textarea>
+            <input type="submit" value="add" class="button is-info">
         </form>
     </div>
 </template>
@@ -77,5 +77,10 @@ export default {
 <style scoped>
 textarea, select, input {
     display: block;
+}
+form {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>

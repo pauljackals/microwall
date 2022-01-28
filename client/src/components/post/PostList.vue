@@ -1,6 +1,6 @@
 <template>
     <ul class="centered-list">
-        <li v-for="post in posts" :key="post._id" class="">
+        <li v-for="post in posts" :key="post._id">
             <Post :post="post"/>
             <div v-if="loggedIn">
                 <div v-if="isPrivate!=1 && post.commentsPublic">

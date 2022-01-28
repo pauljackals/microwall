@@ -1,22 +1,24 @@
 <template>
     <div>
-        <h1>login data</h1>
-        <router-link :to="{name: 'Profile', params:{id:'me'} }">cancel</router-link>
-        <form @submit.prevent="update">
+        <h1 class="title has-text-centered">login data</h1>
+        <div class="center-content">
+            <router-link :to="{name: 'Profile', params:{id:'me'} }" class="button is-info">cancel</router-link>
+        </div>
+        <form @submit.prevent="update" class="box">
             <span v-if="error" class="error">{{error}}</span>
 
             <div v-if="user.passwordOld.errors">
                 <span v-for="(error, index) in user.passwordOld.errors" :key="index" class="error">{{error}}</span>
             </div>
-            <input type="password" v-model="user.passwordOld.value" :placeholder="user.passwordOld.name">
+            <input type="password" v-model="user.passwordOld.value" :placeholder="user.passwordOld.name" class="input">
 
             <div v-if="user.password.errors">
                 <span v-for="(error, index) in user.password.errors" :key="index" class="error">{{error}}</span>
             </div>
-            <input type="password" v-model="user.password.value" :placeholder="user.password.name">
-            <input type="password" v-model="user.passwordRepeat.value" :placeholder="user.passwordRepeat.name">
+            <input type="password" v-model="user.password.value" :placeholder="user.password.name" class="input">
+            <input type="password" v-model="user.passwordRepeat.value" :placeholder="user.passwordRepeat.name" class="input">
 
-            <input type="submit" value="update">
+            <input type="submit" value="update" class="button is-info">
         </form>
     </div>
 </template>
@@ -107,4 +109,13 @@ export default {
         display: block;
         color: red;
     }
+    form {
+        width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .center-content {
+    display: flex;
+    justify-content: center;
+}
 </style>

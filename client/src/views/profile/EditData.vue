@@ -1,21 +1,23 @@
 <template>
     <div>
-        <h1>user data</h1>
-        <router-link :to="{name: 'Profile', params: {id: 'me'} }">cancel</router-link>
-        <form @submit.prevent="update">
+        <h1 class="title has-text-centered">user data</h1>
+        <div class="center-content">
+            <router-link :to="{name: 'Profile', params: {id: 'me'} }" class="button is-info">cancel</router-link>
+        </div>
+        <form @submit.prevent="update" class="box">
             <span v-if="error" class="error">{{error}}</span>
 
             <div v-if="user.firstName.errors">
                 <span v-for="(error, index) in user.firstName.errors" :key="index" class="error">{{error}}</span>
             </div>
-            <input type="text" v-model="user.firstName.value" :placeholder="user.firstName.name">
+            <input type="text" v-model="user.firstName.value" :placeholder="user.firstName.name" class="input">
 
             <div v-if="user.lastName.errors">
                 <span v-for="(error, index) in user.lastName.errors" :key="index" class="error">{{error}}</span>
             </div>
-            <input type="text" v-model="user.lastName.value" :placeholder="user.lastName.name">
+            <input type="text" v-model="user.lastName.value" :placeholder="user.lastName.name" class="input">
 
-            <input type="submit" value="update">
+            <input type="submit" value="update" class="button is-info">
         </form>
     </div>
 </template>
@@ -115,4 +117,13 @@ export default {
         display: block;
         color: red;
     }
+    form {
+        width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .center-content {
+    display: flex;
+    justify-content: center;
+}
 </style>

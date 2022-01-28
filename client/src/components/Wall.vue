@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>{{isPrivate ? "private" : "public"}} wall</h2>
+        <h2 class="title has-text-centered">{{isPrivate ? "private" : "public"}} wall</h2>
         <PostList :posts="posts" :isPrivate="isPrivate"/>
     </div>
 </template>

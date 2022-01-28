@@ -3,10 +3,10 @@
         <h1 class="title has-text-centered">{{currentUser.username}}</h1>
         <h2 class="title has-text-centered">{{currentUser.firstName}} {{currentUser.lastName}}</h2>
         <div v-if="loggedIn">
-            <div v-if="!downloadedUser">
-                <router-link :to="{name: 'EditData'}">edit user data</router-link>
-                <router-link :to="{name: 'EditLogin'}">edit login data</router-link>
-                <router-link :to="{name: 'PostNew'}">add post</router-link>
+            <div v-if="!downloadedUser" class="center-content">
+                <router-link :to="{name: 'EditData'}" class="button is-info">edit user data</router-link>
+                <router-link :to="{name: 'EditLogin'}" class="button is-info">edit login data</router-link>
+                <router-link :to="{name: 'PostNew'}" class="button is-info">add post</router-link>
             </div>
             <div v-else-if="canInvite" class="center-content">
                 <button @click="inviteFriend" class="button is-info">invite</button>

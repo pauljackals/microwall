@@ -1,7 +1,7 @@
 <template>
     <div class="box mb-0 mt-6 has-background-light">
         <div>{{(new Date(post.date)).toLocaleString()}}</div>
-        <div v-if="post.user" class="">
+        <div v-if="post.user">
             <router-link :to="{name: 'Profile', params: {id: post.user._id} }">{{post.user.username}} ({{post.user.firstName}} {{post.user.lastName}})</router-link>
         </div>
         <div>{{post.access}}</div>
