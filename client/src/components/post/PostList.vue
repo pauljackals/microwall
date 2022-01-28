@@ -1,6 +1,6 @@
 <template>
-    <ul>
-        <li v-for="post in posts" :key="post._id">
+    <ul class="centered-list">
+        <li v-for="post in posts" :key="post._id" class="">
             <Post :post="post"/>
             <div v-if="loggedIn">
                 <div v-if="isPrivate!=1 && post.commentsPublic">
@@ -61,5 +61,10 @@ export default {
 <style>
 li {
     margin-bottom: 10px;
+}
+ul.centered-list {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>

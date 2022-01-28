@@ -1,10 +1,10 @@
 <template>
     <div>
-        <h1>friends</h1>
+        <h1 class="title">friends</h1>
         <UserList :users="user.friends ?? []"/>
-        <h2>received invites</h2>
+        <h2 class="title">received invites</h2>
         <UserList :users="user.invitesReceived ?? []"/>
-        <h2>sent invites</h2>
+        <h2 class="title">sent invites</h2>
         <UserList :users="user.invitesSent ?? []"/>
     </div>
 </template>
@@ -25,3 +25,8 @@ export default {
     }
 }
 </script>
+<style scoped>
+h1, h2 {
+    text-align: center;
+}
+</style>

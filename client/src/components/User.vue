@@ -1,29 +1,31 @@
 <template>
     <div>
-        <h1>{{currentUser.username}}</h1>
-        <h2>{{currentUser.firstName}} {{currentUser.lastName}}</h2>
+        <h1 class="title has-text-centered">{{currentUser.username}}</h1>
+        <h2 class="title has-text-centered">{{currentUser.firstName}} {{currentUser.lastName}}</h2>
         <div v-if="loggedIn">
             <div v-if="!downloadedUser">
                 <router-link :to="{name: 'EditData'}">edit user data</router-link>
                 <router-link :to="{name: 'EditLogin'}">edit login data</router-link>
                 <router-link :to="{name: 'PostNew'}">add post</router-link>
             </div>
-            <div v-else-if="canInvite">
-                <button @click="inviteFriend">invite</button>
+            <div v-else-if="canInvite" class="center-content">
+                <button @click="inviteFriend" class="button is-info">invite</button>
             </div>
-            <div v-else-if="canAccept">
-                <button @click="acceptFriend">accept</button>
-                <button @click="declineFriend">decline</button>
+            <div v-else-if="canAccept" class="center-content">
+                <button @click="acceptFriend" class="button is-success">accept</button>
+                <button @click="declineFriend" class="button is-danger">decline</button>
             </div>
-            <div v-else-if="canCancel">
-                <button @click="cancelFriend">cancel</button>
+            <div v-else-if="canCancel" class="center-content">
+                <button @click="cancelFriend" class="button is-info">cancel</button>
             </div>
-            <div v-else-if="canRemove">
-                <button @click="removeFriend">unfriend</button>
+            <div v-else-if="canRemove" class="center-content">
+                <button @click="removeFriend" class="button is-danger">unfriend</button>
             </div>
         </div>
-        <router-link :to="{name: 'WallPublic'}">public wall</router-link>
-        <router-link v-if="loggedIn && (!downloadedUser || canRemove)" :to="{name: 'WallPrivate'}">private wall</router-link>
+        <div class="center-content">
+            <router-link :to="{name: 'WallPublic'}" class="button is-info">public wall</router-link>
+            <router-link v-if="loggedIn && (!downloadedUser || canRemove)" :to="{name: 'WallPrivate'}" class="button is-info">private wall</router-link>
+        </div>
         <router-view v-if="checked" :key="$route.fullPath" :user="currentUser"/>
     </div>
 </template>
@@ -123,7 +125,8 @@ export default {
 </script>
 
 <style scoped>
-a {
-    display: block;
+.center-content {
+    display: flex;
+    justify-content: center;
 }
 </style>

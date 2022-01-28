@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>users</h1>
+        <h1 class="title">users</h1>
         <UserList :users="users"/>
     </div>
 </template>
@@ -26,3 +26,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+h1 {
+    text-align: center;
+}
+</style>

@@ -1,6 +1,5 @@
 <template>
     <div>
-        <h1>home</h1>
         <PostList :posts="posts" :isPrivate="-1"/>
     </div>
 </template>

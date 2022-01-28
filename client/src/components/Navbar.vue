@@ -1,15 +1,18 @@
 <template>
-    <div>
-        <router-link :to="{name: 'Home'}">home</router-link>
-        <router-link :to="{name: 'Users'}">users</router-link>
-        <div class="wrapper-inline" v-if="!loggedIn">
-            <router-link :to="{name: 'Login'}">login</router-link>
-            <router-link :to="{name: 'Register'}">register</router-link>
-        </div>
-        <div class="wrapper-inline" v-else>
-            <router-link :to="{name: 'Friends'}">friends</router-link>
-            <router-link :to="{name: 'Profile', params: {id: 'me'} }">{{user.username}}</router-link>
-            <LogoutButton/>
+    <div class="block has-background-info">
+        <h1 class="title is-1 has-text-white-ter">MicroWall</h1>
+        <div class="navbar has-background-info">
+            <router-link :to="{name: 'Home'}" class="button is-dark">home</router-link>
+            <router-link :to="{name: 'Users'}" class="button is-dark">users</router-link>
+            <div class="wrapper-inline" v-if="!loggedIn">
+                <router-link :to="{name: 'Login'}" class="button is-dark">login</router-link>
+                <router-link :to="{name: 'Register'}" class="button is-dark">register</router-link>
+            </div>
+            <div class="wrapper-inline" v-else>
+                <router-link :to="{name: 'Friends'}" class="button is-dark">friends</router-link>
+                <router-link :to="{name: 'Profile', params: {id: 'me'} }" class="button is-dark">{{user.username}}</router-link>
+                <LogoutButton class="button is-dark"/>
+            </div>
         </div>
     </div>
 </template>
@@ -37,7 +40,14 @@ export default {
 </script>
 
 <style scoped>
-a {
-    margin-right: 10px;
+a:not(:last-child) {
+    margin-right: 50px;
+}
+.navbar {
+    display: flex;
+    justify-content: center;
+}
+.title {
+    text-align: center;
 }
 </style>

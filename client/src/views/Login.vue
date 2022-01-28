@@ -1,20 +1,20 @@
 <template>
     <div>
-        <h1>login</h1>
-        <form @submit.prevent="login">
+        <h1 class="title has-text-centered">login</h1>
+        <form @submit.prevent="login" class="box">
             <span v-if="error" class="error">{{error}}</span>
 
             <div v-if="user.username.errors">
                 <span v-for="(error, index) in user.username.errors" :key="index" class="error">{{error}}</span>
             </div>
-            <input type="text" v-model="user.username.value" :placeholder="user.username.name">
+            <input type="text" v-model="user.username.value" :placeholder="user.username.name" class="input">
 
             <div v-if="user.password.errors">
                 <span v-for="(error, index) in user.password.errors" :key="index" class="error">{{error}}</span>
             </div>
-            <input type="password" v-model="user.password.value" :placeholder="user.password.name">
+            <input type="password" v-model="user.password.value" :placeholder="user.password.name" class="input">
 
-            <input type="submit" value="log in">
+            <input type="submit" value="log in" class="button is-info">
         </form>
     </div>
 </template>
@@ -98,5 +98,10 @@ export default {
     .error {
         display: block;
         color: red;
+    }
+    form {
+        width: 500px;
+        margin-left: auto;
+        margin-right: auto;
     }
 </style>
