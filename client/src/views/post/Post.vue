@@ -2,10 +2,16 @@
     <div>
         <h1 class="title has-text-centered">post</h1>
         <Post :post="post" class="post"/>
+
         <form @submit.prevent="addComment">
-            <textarea v-model="comment.text" placeholder="text" class="textarea has-fixed-size"></textarea>
+            <span v-if="error" class="error">{{error}}</span>
+
+            <FormFieldErrors :field="comment.text"/>
+            <FormTextarea :field="comment.text" v-model="comment.text.value"/>
+
             <input type="submit" value="send" class="button is-info">
         </form>
+
         <ul>
             <li v-for="comment in (post.commentsPublic ?? post.commentsPrivate)" :key="comment._id">
                 <Comment :comment="comment"/>
@@ -21,18 +27,24 @@ import {mapActions, mapState, mapMutations} from "vuex"
 import { CURRENT_POST } from '../../store/types/state'
 import { COMMENT_CURRENT_POST, GET_POST } from '../../store/types/actions'
 import { CLEAR_CURRENT_POST } from '../../store/types/mutations'
+import { getFormField, mapFormFields, validateFormFields, validateLength } from '../../utils/functions'
+import FormFieldErrors from '../../components/form/FormFieldErrors.vue'
+import FormTextarea from '../../components/form/FormTextarea.vue'
 
 export default {
     data() {
         return {
             comment: {
-                text: ""
-            }
+                text: getFormField("text", [validateLength(256)], "textarea")
+            },
+            error: ""
         }
     },
     components: {
         Post,
-        Comment
+        Comment,
+        FormFieldErrors,
+        FormTextarea
     },
     computed: {
         ...mapState({
@@ -48,13 +60,23 @@ export default {
             clearCurrentPost: CLEAR_CURRENT_POST
         }),
         addComment() {
-            const {text} = this.comment
-            if(!text.length){
+            this.error = ""
+
+            if(!validateFormFields(this.comment)) {
                 return
             }
-            this.commentCurrentPost({_id: this.post._id, text, isPrivate: !this.post.commentsPublic}).then(() => {
-                this.comment.text = ""
-            }).catch(err => console.error(err))
+            
+            this.commentCurrentPost({
+                ...mapFormFields(this.comment),
+                _id: this.post._id,
+                isPrivate: !this.post.commentsPublic
+
+            }).then(() => {
+                this.comment.text.reset()
+
+            }).catch(error => {
+                this.error = error.response ? error.response.data.message : "connection error"
+            })
         }
     },
     props: {
@@ -68,7 +90,9 @@ export default {
     },
     created() {
         const isPrivate = this.access==="public" ? false : (this.access==="private" ? true : undefined)
-        this.getPost({_id: this.id, isPrivate}).catch(() => this.$router.push({name: "NotFound", params: {path: this.$route.fullPath.slice(1).split("/")}}))
+        this.getPost({_id: this.id, isPrivate}).catch(() =>
+            this.$router.push({name: "NotFound", params: {path: this.$route.fullPath.slice(1).split("/")}})
+        )
     },
     unmounted(){
         this.clearCurrentPost()
@@ -89,5 +113,9 @@ ul {
     width: 600px;
     margin-left: auto;
     margin-right: auto;
+}
+.error {
+    display: block;
+    color: red;
 }
 </style>

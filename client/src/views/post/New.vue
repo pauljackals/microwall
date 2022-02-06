@@ -2,12 +2,22 @@
     <div>
         <h1 class="title has-text-centered">add post</h1>
         <form @submit.prevent="add">
-            <textarea placeholder="text" v-model="post.text" class="textarea has-fixed-size"></textarea>
-            <select v-model="post.access" class="select is-normal">
+            <span v-if="error" class="error">{{error}}</span>
+
+            <FormFieldErrors :field="post.text"/>
+            <FormTextarea :field="post.text" v-model="post.text.value"/>
+
+            <FormFieldErrors :field="post.access"/>
+            <select v-model="post.access.value" class="select is-normal">
                 <option v-for="access in postAccessEnumValues" :key="access" :value="access">{{access}}</option>
             </select>
-            <textarea placeholder="links" v-model="post.links" class="textarea has-fixed-size"></textarea>
-            <textarea placeholder="images" v-model="post.images" class="textarea has-fixed-size"></textarea>
+
+            <FormFieldErrors :field="post.links"/>
+            <FormTextarea :field="post.links" v-model="post.links.value"/>
+
+            <FormFieldErrors :field="post.images"/>
+            <FormTextarea :field="post.images" v-model="post.images.value"/>
+
             <input type="submit" value="add" class="button is-info">
         </form>
     </div>
@@ -17,37 +27,25 @@
 import {mapActions} from "vuex"
 import { ADD_POST } from '../../store/types/actions'
 import {POST_ACCESS_ENUM} from "../../utils/types"
-
-const validateUrls = urls => {
-    if(urls===undefined) {
-        return true
-    }
-    return urls.every(url => {
-        try {
-            return !!(new URL(url))
-        } catch(err) {
-            return false
-        }
-    })
-}
-
-const parseUrlsRaw = urlsRaw => {
-    if(urlsRaw==="") {
-        return undefined
-    }
-    return urlsRaw.split("\n")
-}
+import FormFieldErrors from '../../components/form/FormFieldErrors.vue'
+import FormTextarea from '../../components/form/FormTextarea.vue'
+import { getFormField, mapFormFields, validateEnum, validateFormFields, validateLength, validateUrls } from '../../utils/functions'
 
 export default {
     data(){
         return {
             post: {
-                access: POST_ACCESS_ENUM.PUBLIC,
-                text: "",
-                links: "",
-                images: ""
-            }
+                access: getFormField("access", [validateEnum(POST_ACCESS_ENUM)], "select", POST_ACCESS_ENUM.PUBLIC),
+                text: getFormField("text", [validateLength(1024)], "textarea"),
+                links: getFormField("links", [validateLength(16384, 0), validateUrls], "textarea"),
+                images: getFormField("images", [validateLength(16384, 0), validateUrls], "textarea")
+            },
+            error: ""
         }
+    },
+    components: {
+        FormFieldErrors,
+        FormTextarea
     },
     computed: {
         postAccessEnumValues(){
@@ -59,25 +57,30 @@ export default {
             addPost: ADD_POST
         }),
         add(){
-            const {text, access, links: linksRaw, images: imagesRaw} = this.post
-            const links = parseUrlsRaw(linksRaw)
-            const images = parseUrlsRaw(imagesRaw)
-            if(!this.postAccessEnumValues.includes(access) || !text.length || !validateUrls(links) || !validateUrls(images)) {
+            this.error = ""
+
+            if(!validateFormFields(this.post)) {
                 return
             }
-            this.addPost({text, access, links, images}).then(() => {
-                this.$router.push({name: access===POST_ACCESS_ENUM.PRIVATE ? "WallPrivate" : "WallPublic", params: {id:"me"}})
 
-            }).catch(err => console.error(err))
+            const {access, links, images} = this.post
+            this.addPost({
+                ...mapFormFields(this.post),
+                links: links.valueParsed,
+                images: images.valueParsed
+
+            }).then(() => {
+                this.$router.push({name: access.value===POST_ACCESS_ENUM.PRIVATE ? "WallPrivate" : "WallPublic", params: {id:"me"}})
+
+            }).catch(error => {
+                this.error = error.response ? error.response.data.message : "connection error"
+            })
         }
     }
 }
 </script>
 
 <style scoped>
-textarea, select, input {
-    display: block;
-}
 form {
     width: 800px;
     margin-left: auto;

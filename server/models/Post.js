@@ -43,14 +43,14 @@ const postSchema = new Schema({
     links: {
         type: [{
             ...STRING,
-            maxlength: 256,
+            maxlength: 16384,
             validate: validateUrl
         }]
     },
     images: {
         type: [{
             ...STRING,
-            maxlength: 256,
+            maxlength: 16384,
             validate: validateUrl
         }]
     }

@@ -15,9 +15,7 @@ export default {
                     name: 'Login'
                 })
 
-            }).catch(error => {
-                console.error(error)
-            })
+            }).catch(() => {})
         },
         ...mapActions({
             logoutStore: LOGOUT

@@ -18,7 +18,7 @@ export default {
         api.getPosts().then(response => {
             this.posts = response.data.posts
         
-        }).catch(err => console.error(err))
+        }).catch(() => {})
     },
     components: {
         PostList

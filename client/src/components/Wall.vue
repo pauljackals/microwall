@@ -37,7 +37,6 @@ export default {
     },
     created() {
         if(this.isPrivate===1 && !(this.loggedIn && this.userStore._id===this.user._id || this.userStore.friends.some(friend => friend._id===this.user._id))) {
-            console.log(this.userStore._id, this.user._id);
             this.$router.replace({name: "WallPublic"})
         }
     },
@@ -46,8 +45,9 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style>
 .multiline {
     white-space: pre-wrap;
+    word-break: break-word;
 }
 </style>

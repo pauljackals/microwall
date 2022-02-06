@@ -1,26 +1,27 @@
-const getFormField = (name, validators=[], type="text") => {
+const getFormField = (name, validators=[], type="text", value=undefined) => {
     return {
         name,
-        value: undefined,
+        value,
         errors: [],
         type,
         validate() {
-            this.resetErrors()
+            this.errors = []
             return validators.map(validator => validator(this))
                 .every(validator => validator)
         },
-        resetErrors() {
+        reset() {
             this.errors = []
+            this.value = undefined
         }
     }
 }
 
 const validateLength = (maxLength=32, minLength=1) => ({value, errors, name}) => {
-    if(value===undefined || value.length < minLength) {
+    if(minLength && (value===undefined || value.length < minLength)) {
         errors.push(`${name} must not be ${minLength===1 ? "empty" : `shorter than ${minLength}`}`)
         return false
 
-    } else if(value.length > maxLength) {
+    } else if(value && value.length > maxLength) {
         errors.push(`${name} must not be longer than ${maxLength}`)
         return false
 
@@ -45,6 +46,38 @@ const validatePasswordsMatch = repeatPasswordField => ({value, errors}) => {
     }
 }
 
+const validateUrls = field => {
+    const {value, errors, name} = field
+
+    if(value===undefined || value==="") {
+        return true
+    }
+
+    const urls = value.split("\n")
+    const result = urls.every(url => {
+        try {
+            return !!(new URL(url))
+        } catch(err) {
+            return false
+        }
+    })
+
+    if(!result) {
+        errors.push(`${name} are invalid`)
+    } else {
+        field.valueParsed = urls
+    }
+    return result
+}
+
+const validateEnum = enum_ => ({value, errors, name}) => {
+    if(!Object.values(enum_).includes(value)) {
+        errors.push(`${name} is invalid`)
+        return false
+    }
+    return true
+}
+
 const validateFormFields = fields => Object.values(fields)
     .map(field => field.validate())
     .every(field => field)
@@ -59,5 +92,7 @@ export {
     validateLength,
     validateFormFields,
     validatePasswordsMatch,
-    mapFormFields
+    mapFormFields,
+    validateUrls,
+    validateEnum
 }

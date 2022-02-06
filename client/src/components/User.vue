@@ -99,19 +99,19 @@ export default {
     },
     methods: {
         inviteFriend(){
-            this.inviteFriendAction(this.currentUser).catch(err => console.error(err))
+            this.inviteFriendAction(this.currentUser).catch(() => {})
         },
         declineFriend(){
-            this.declineFriendAction(this.currentUser).catch(err => console.error(err))
+            this.declineFriendAction(this.currentUser).catch(() => {})
         },
         acceptFriend(){
-            this.acceptFriendAction(this.currentUser).catch(err => console.error(err))
+            this.acceptFriendAction(this.currentUser).catch(() => {})
         },
         removeFriend(){
-            this.removeFriendAction(this.currentUser).catch(err => console.error(err))
+            this.removeFriendAction(this.currentUser).catch(() => {})
         },
         cancelFriend(){
-            this.cancelFriendAction(this.currentUser).catch(err => console.error(err))
+            this.cancelFriendAction(this.currentUser).catch(() => {})
         },
         ...mapActions({
             inviteFriendAction: INVITE_FRIEND,

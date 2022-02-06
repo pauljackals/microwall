@@ -137,7 +137,8 @@ router.post("/:id", authenticationCheck, (req, res, next) => {
                 sio.ofWrapped(`/post/${post._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
                 res.status(201).json({comment})
             })
-        })
+            
+        }).catch(err => next(err))
 
     }).catch(err => next(err))
 })

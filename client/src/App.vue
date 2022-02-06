@@ -1,7 +1,8 @@
 <template>
   <Navbar v-if="checked"/>
   <router-view v-if="checked"/>
-  <div v-else>loading</div>
+
+  <h1 v-else class="title has-text-centered">loading</h1>
 </template>
 
 <script>
@@ -34,5 +35,9 @@ export default {
 <style>
 .wrapper-inline {
   display: inline;
+}
+.error {
+    display: block;
+    color: red;
 }
 </style>
