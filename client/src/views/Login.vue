@@ -4,15 +4,11 @@
         <form @submit.prevent="login" class="box">
             <span v-if="error" class="error">{{error}}</span>
 
-            <div v-if="user.username.errors">
-                <span v-for="(error, index) in user.username.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="text" v-model="user.username.value" :placeholder="user.username.name" class="input">
+            <FormFieldErrors :field="user.username"/>
+            <FormField :field="user.username"/>
 
-            <div v-if="user.password.errors">
-                <span v-for="(error, index) in user.password.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="password" v-model="user.password.value" :placeholder="user.password.name" class="input">
+            <FormFieldErrors :field="user.password"/>
+            <FormField :field="user.password"/>
 
             <input type="submit" value="log in" class="button is-info">
         </form>
@@ -22,60 +18,33 @@
 <script>
 import {LOGIN} from "../store/types/actions"
 import {mapActions} from "vuex"
+import { getFormField, mapFormFields, validateFormFields, validateLength } from '../utils/functions'
+import FormFieldErrors from "../components/form/FormFieldErrors.vue"
+import FormField from "../components/form/FormField.vue"
 
-const defaultValue = name => ({
-    name,
-    value: "",
-    errors: []
-})
-const maxLength = 32
 export default {
     data() {
         return  {
             user: {
-                username: defaultValue("username"),
-                password: defaultValue("password")
+                username: getFormField("username", [validateLength()]),
+                password: getFormField("password", [validateLength(256)], "password"),
             },
             error: ""
         }
     },
+    components: {
+        FormFieldErrors,
+        FormField
+    },
     methods: {
-        resetErrors() {
-            Object.entries(this.user).forEach(entry => {
-                const {errors} = entry[1]
-                errors.splice(0, errors.length)
-            })
-            this.error = ""
-        },
         login() {
-            this.resetErrors()
+            this.error = ""
 
-            const userEntries = Object.entries(this.user)
-
-            userEntries.forEach(entry => {
-                const {value, errors, name} = entry[1]
-                if(value.length===0) {
-                    errors.push(`${name} must not be empty`)
-
-                } else if(value.length > maxLength) {
-                    errors.push(`${name} must not be longer than ${maxLength} characters`)
-                }
-            })
-
-            const {
-                username,
-                password
-            } = this.user
-
-            if(userEntries.some(([_, {errors}]) => errors.length)) {
+            if(!validateFormFields(this.user)) {
                 return
             }
 
-            this.loginStore(Object.entries({username, password}).reduce((object, [key, value]) => {
-                object[key]=value.value
-                return object
-
-            }, {})).then(() => {
+            this.loginStore(mapFormFields(this.user)).then(() => {
                 this.$router.push({
                     name: 'Home'
                 })
@@ -92,9 +61,6 @@ export default {
 </script>
 
 <style scoped>
-    input {
-        display: block;
-    }
     .error {
         display: block;
         color: red;

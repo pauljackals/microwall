@@ -45,7 +45,7 @@ if(isDevelopment) {
 }
 app.use(errorHandler)
 
-const port = process.env.SERVER_PORT || (isDevelopment ? 5000 : 443)
+const port = process.env.SERVER_PORT || (isDevelopment ? 5000 : 8443)
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 })

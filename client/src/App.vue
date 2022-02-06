@@ -20,7 +20,6 @@ export default {
     }
   },
   created() {
-    document.title = "MicroWall"
     this.getUserData().catch(() => {})
       .finally(() => this.checked=true)
   },

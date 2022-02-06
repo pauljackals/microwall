@@ -4,8 +4,8 @@ module.exports = {
     STRING: {
         type: String,
         required: true,
-        maxLength: 128,
-        minLength: 1
+        maxlength: 32,
+        minlength: 1
     },
     USER: {
         type: SchemaTypes.ObjectId,

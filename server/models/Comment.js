@@ -2,7 +2,10 @@ const {Schema, model} = require("../config/mongo")
 const { STRING, USER, DATE, COMMENT, POST } = require("./types")
 
 const commentSchema = new Schema({
-    text: STRING,
+    text: {
+        ...STRING,
+        maxlength: 256
+    },
     user: USER,
     date: DATE,
     post: POST

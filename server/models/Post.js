@@ -13,13 +13,16 @@ const validateUrl = url => {
 }
 
 const postSchema = new Schema({
-    text: STRING,
+    text: {
+        ...STRING,
+        maxlength: 1024
+    },
     user: USER,
     date: DATE,
     access: {
         type: String,
         enum: Object.values(POST_ACCESS_ENUM),
-        required: true
+        required: true,
     },
     commentsPublic: {
         type: [COMMENT],
@@ -40,12 +43,14 @@ const postSchema = new Schema({
     links: {
         type: [{
             ...STRING,
+            maxlength: 256,
             validate: validateUrl
         }]
     },
     images: {
         type: [{
             ...STRING,
+            maxlength: 256,
             validate: validateUrl
         }]
     }
