@@ -24,9 +24,16 @@ const userSchema = new Schema({
     }
 })
 
+const maxlengthValidator = (maxlength=32) => field => {
+    if(field && field.length > maxlength) {
+        return false
+    }
+    return true
+}
 const passwordValidator = (password, cb) => {
-    if(password && password.length > 256) {
-        return cb(new ValidationError("password too long"))
+    const maxlength = 256
+    if(!maxlengthValidator(maxlength)(password)) {
+        return cb(new ValidationError(`password must not be longer than ${maxlength}`))
     }
     cb()
 }
@@ -35,5 +42,7 @@ userSchema.plugin(passportLocalMongoose, {
     populateFields: {path: "friends invitesSent invitesReceived posts", options: {sort:{"posts.date":1}}, select:"+commentsPublic +commentsPrivate"},
     passwordValidator
 })
+
+userSchema.path("username").validate(maxlengthValidator())
 
 module.exports = model(USER.ref, userSchema)
