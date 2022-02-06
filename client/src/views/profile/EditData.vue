@@ -1,21 +1,20 @@
 <template>
     <div>
-        <h1 class="title has-text-centered">user data</h1>
+        <h1 class="title has-text-centered">edit data</h1>
         <div class="center-content">
             <router-link :to="{name: 'Profile', params: {id: 'me'} }" class="button is-info">cancel</router-link>
         </div>
         <form @submit.prevent="update" class="box">
             <span v-if="error" class="error">{{error}}</span>
 
-            <div v-if="user.firstName.errors">
-                <span v-for="(error, index) in user.firstName.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="text" v-model="user.firstName.value" :placeholder="user.firstName.name" class="input">
+            <!-- <FormFieldErrors :field="user.username"/>
+            <FormField :field="user.username"/> -->
 
-            <div v-if="user.lastName.errors">
-                <span v-for="(error, index) in user.lastName.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="text" v-model="user.lastName.value" :placeholder="user.lastName.name" class="input">
+            <FormFieldErrors :field="user.firstName"/>
+            <FormField :field="user.firstName"/>
+
+            <FormFieldErrors :field="user.lastName"/>
+            <FormField :field="user.lastName"/>
 
             <input type="submit" value="update" class="button is-info">
         </form>
@@ -26,65 +25,38 @@
 import {mapState, mapActions} from "vuex"
 import {USER} from "../../store/types/state"
 import {UPDATE_USER_DATA} from "../../store/types/actions"
-
-const defaultValue = (name, type="text", value=undefined) => ({
-    name,
-    value,
-    errors: [],
-    type
-})
-const maxLength = 32
-const validateLength = ({value, name, errors}) => {
-    if(value===undefined || value.length===0) {
-        errors.push(`${name} must not be empty`)
-
-    } else if(value!==undefined && (value.length > maxLength)) {
-        errors.push(`${name} must not be longer than ${maxLength} characters`)
-    }
-}
-const mapFields = fields => Object.entries(fields).reduce((object, [key, value]) => {
-    object[key]=value.value
-    return object
-}, {})
+import { getFormField, mapFormFields, validateFormFields, validateLength } from '../../utils/functions'
+import FormFieldErrors from "../../components/form/FormFieldErrors.vue"
+import FormField from "../../components/form/FormField.vue"
 
 export default {
     data() {
         return  {
             user: {
-                firstName: defaultValue("first name"),
-                lastName: defaultValue("last name")
+                // username: getFormField("username", [validateLength()]),
+                firstName: getFormField("last name", [validateLength()]),
+                lastName: getFormField("last name", [validateLength()])
             },
             error: ""
         }
     },
+    components: {
+        FormFieldErrors,
+        FormField
+    },
     methods: {
-        resetErrors() {
-            Object.values(this.user).forEach(field => {
-                field.errors = []
-            })
-            this.error = ""
-        },
         update() {
-            this.resetErrors()
+            this.error = ""
 
-            const fields = Object.values(this.user)
-
-            const {
-                firstName,
-                lastName
-            } = this.user
-
-            validateLength(firstName)
-            validateLength(lastName)
-
-            if(fields.some(({errors}) => errors.length)) {
+            if(!validateFormFields(this.user)) {
                 return
             }
             
-            this.updateUserData(mapFields(this.user)).then(() => this.$router.push({
-                name: 'Profile', params: {id: "me"}
+            this.updateUserData(mapFormFields(this.user)).then(() => this.$router.push({
+                name: 'Profile',
+                params: {id: "me"}
+
             })).catch(error => {
-                console.log(error);
                 this.error = error.response ? error.response.data.message : "connection error"
             })
         },
@@ -100,19 +72,24 @@ export default {
     created() {
         const {
             firstName: firstNameStore,
-            lastName: lastNameStore
+            lastName: lastNameStore,
+            // username: usernameStore
         } = this.userStore
-        const {firstName, lastName} = this.user
+
+        const {
+            firstName,
+            lastName,
+            // username
+        } = this.user
+
         firstName.value = firstNameStore
         lastName.value = lastNameStore
+        // username.value = usernameStore
     }
 }
 </script>
 
 <style scoped>
-    input {
-        display: block;
-    }
     .error {
         display: block;
         color: red;
@@ -123,7 +100,7 @@ export default {
         margin-right: auto;
     }
     .center-content {
-    display: flex;
-    justify-content: center;
-}
+        display: flex;
+        justify-content: center;
+    }
 </style>

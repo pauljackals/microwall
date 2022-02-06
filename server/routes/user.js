@@ -18,10 +18,11 @@ router.patch("/me", authenticationCheck, (req, res, next) => {
     const user = req.user
     const {
         firstName,
-        lastName
+        lastName,
+        username
     } = req.body
 
-    User.findByIdAndUpdate(user._id, {firstName, lastName}, {new: true}).exec().then(user => {
+    User.findByIdAndUpdate(user._id, {firstName, lastName, username}, {new: true}).exec().then(user => {
         res.status(200).json({user})
 
     }).catch(err => {

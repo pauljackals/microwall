@@ -65,10 +65,10 @@ export default {
         })
     },
 
-    [UPDATE_USER_DATA]({commit}, {firstName, lastName}) {
-        return api.updateUserData(firstName, lastName).then(response => {
-            const {firstName, lastName} = response.data.user
-            commit(UPDATE_USER, {firstName, lastName})
+    [UPDATE_USER_DATA]({commit}, {username, firstName, lastName}) {
+        return api.updateUserData(username, firstName, lastName).then(response => {
+            const {username, firstName, lastName} = response.data.user
+            commit(UPDATE_USER, {username, firstName, lastName})
         })
     },
 

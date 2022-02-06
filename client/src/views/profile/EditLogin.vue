@@ -1,22 +1,18 @@
 <template>
     <div>
-        <h1 class="title has-text-centered">login data</h1>
+        <h1 class="title has-text-centered">edit password</h1>
         <div class="center-content">
             <router-link :to="{name: 'Profile', params:{id:'me'} }" class="button is-info">cancel</router-link>
         </div>
         <form @submit.prevent="update" class="box">
             <span v-if="error" class="error">{{error}}</span>
 
-            <div v-if="user.passwordOld.errors">
-                <span v-for="(error, index) in user.passwordOld.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="password" v-model="user.passwordOld.value" :placeholder="user.passwordOld.name" class="input">
+            <FormFieldErrors :field="user.passwordOld"/>
+            <FormField :field="user.passwordOld"/>
 
-            <div v-if="user.password.errors">
-                <span v-for="(error, index) in user.password.errors" :key="index" class="error">{{error}}</span>
-            </div>
-            <input type="password" v-model="user.password.value" :placeholder="user.password.name" class="input">
-            <input type="password" v-model="user.passwordRepeat.value" :placeholder="user.passwordRepeat.name" class="input">
+            <FormFieldErrors :field="user.password"/>
+            <FormField :field="user.password"/>
+            <FormField :field="passwordRepeat"/>
 
             <input type="submit" value="update" class="button is-info">
         </form>
@@ -26,73 +22,41 @@
 <script>
 import {mapActions} from "vuex"
 import {UPDATE_USER_LOGIN} from "../../store/types/actions"
-
-const defaultValue = (name, type="text", value=undefined) => ({
-    name,
-    value,
-    errors: [],
-    type
-})
-const maxLength = 32
-const validateLength = ({value, name, errors}) => {
-    if(value===undefined || value.length===0) {
-        errors.push(`${name} must not be empty`)
-
-    } else if(value!==undefined && (value.length > maxLength)) {
-        errors.push(`${name} must not be longer than ${maxLength} characters`)
-    }
-}
-const mapFields = fields => Object.entries(fields).reduce((object, [key, value]) => {
-    object[key]=value.value
-    return object
-}, {})
+import { getFormField, mapFormFields, validateFormFields, validateLength, validatePasswordsMatch } from '../../utils/functions'
+import FormFieldErrors from "../../components/form/FormFieldErrors.vue"
+import FormField from "../../components/form/FormField.vue"
 
 export default {
     data() {
+        const passwordRepeat = getFormField("repeat password", [], "password")
         return  {
             user: {
-                password: defaultValue("new password", "password"),
-                passwordRepeat: defaultValue("repeat new password", "password"),
-                passwordOld: defaultValue("old password", "password")
+                password: getFormField("new password", [validateLength(256), validatePasswordsMatch(passwordRepeat)], "password"),
+                passwordOld: getFormField("old password", [validateLength(256)], "password")
             },
-            error: ""
+            error: "",
+            passwordRepeat
         }
     },
+    components: {
+        FormFieldErrors,
+        FormField
+    },
     methods: {
-        resetErrors() {
-            Object.values(this.user).forEach(field => {
-                field.errors = []
-            })
-            this.error = ""
-        },
         update() {
-            this.resetErrors()
-
-            const fields = Object.values(this.user)
-
-            const {
-                password,
-                passwordRepeat,
-                passwordOld
-            } = this.user
-
-            validateLength(password)
-            validateLength(passwordOld)
-            validateLength(passwordRepeat)
-
-            if(password.value!==passwordRepeat.value){
-                password.errors.push("passwords don't match")
-            }
-
-            if(fields.some(({errors}) => errors.length)) {
+            this.error = ""
+            
+            if(!validateFormFields(this.user)) {
                 return
             }
 
-            this.updateUserLogin(mapFields({password, passwordOld})).then(() => this.$router.push({
-                name: 'Profile', params:{id:'me'} 
+            this.updateUserLogin(mapFormFields(this.user)).then(() => this.$router.push({
+                name: 'Profile',
+                params:{id:'me'}
+
             })).catch(error => {
-                    this.error = error.response ? error.response.data.message : "connection error"
-                })
+                this.error = error.response ? error.response.data.message : "connection error"
+            })
         },
         ...mapActions({
             updateUserLogin: UPDATE_USER_LOGIN
@@ -102,9 +66,6 @@ export default {
 </script>
 
 <style scoped>
-    input {
-        display: block;
-    }
     .error {
         display: block;
         color: red;
@@ -115,7 +76,7 @@ export default {
         margin-right: auto;
     }
     .center-content {
-    display: flex;
-    justify-content: center;
-}
+        display: flex;
+        justify-content: center;
+    }
 </style>

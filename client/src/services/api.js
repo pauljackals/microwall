@@ -26,8 +26,9 @@ export default {
     getUserData() {
         return axios.get("/user/me")
     },
-    updateUserData(firstName, lastName) {
+    updateUserData(username, firstName, lastName) {
         return axios.patch("/user/me", {
+            username,
             firstName,
             lastName
         })
