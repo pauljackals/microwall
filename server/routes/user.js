@@ -1,5 +1,5 @@
 const User = require("../models/User")
-const authenticationCheck = require("../utils/authenticationCheck")
+const {authenticationCheck} = require("../utils/middlewares")
 const router = require("express").Router()
 const { POST_ACCESS_ENUM } = require("../models/types")
 

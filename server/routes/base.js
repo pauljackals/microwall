@@ -1,6 +1,6 @@
 const passport = require("passport")
 const User = require("../models/User")
-const authenticationCheck = require("../utils/authenticationCheck")
+const {authenticationCheck} = require("../utils/middlewares")
 const { makeUserSafe } = require("../utils/functions")
 const router = require("express").Router()
 

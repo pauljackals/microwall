@@ -9,7 +9,11 @@ export default {
         return sio
     },
     listenToPost(id, isPrivate) {
-        const sio = io(`${baseURL}/post/${id}`, {withCredentials: true, auth: {isPrivate}})
+        const sio = io(`${baseURL}/post/${id}`, {
+            withCredentials: true,
+            forceNew: true,
+            query: isPrivate!==undefined ? {isPrivate} : {}
+        })
         return sio
     }
 }
