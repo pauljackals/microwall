@@ -90,104 +90,107 @@ router.get("/:id", (req, res, next) => {
 })
 
 router.patch("/:id/friend/add", authenticationCheck, (req, res, next) => {
-    const {id} = req.params
-    const {_id} = req.user
+    const {
+        params: {id: idFriend},
+        user,
+        user: {_id: idUser}
+    } = req
 
-    if(id===_id.toString()){
+    if(idFriend===idUser.toString()){
         return next(new UserSelfReferenceError())
+    }
+    if([user.friends, user.invitesSent, user.invitesReceived].some(friends =>
+        friends.some(friend => friend._id.toString() === idFriend)
+    )) {
+        return next(new FriendError())
     }
 
     User.findOneAndUpdate(
         {
-            _id: id,
-            friends: {$ne: _id},
-            invitesSent: {$ne: _id},
-            invitesReceived: {$ne: _id}
+            _id: idFriend,
+            friends: {$ne: idUser},
+            invitesSent: {$ne: idUser},
+            invitesReceived: {$ne: idUser}
         },
-        {$push: {invitesReceived: _id}},
+        {$push: {invitesReceived: idUser}},
         {new: true}
     
-    ).then(userInvited => {
+    ).exec().then(userInvited => {
         if(!userInvited) {
             throw new FriendError()
         }
-        User.findOneAndUpdate(
-            {
-                _id,
-                friends: {$ne: id},
-                invitesSent: {$ne: id},
-                invitesReceived: {$ne: id}
-            },
-            {$push: {invitesSent: id}},
-            {new: true}
-            
-        ).then(user => {
+
+        user.invitesSent.push(idFriend)
+        return user.save().then(user => {
             if(!user) {
                 throw new FriendError()
             }
             res.status(200).json({user: userInvited})
-
-        }).catch(err => next(err))
+        })
 
     }).catch(err => next(err))
 })
 
 router.patch("/:id/friend/decline", authenticationCheck, (req, res, next) => {
-    const {id} = req.params
-    const {_id} = req.user
+    const {
+        params: {id: idFriend},
+        user,
+        user: {_id: idUser}
+    } = req
 
-    if(id===_id.toString()){
+    if(idFriend===idUser.toString()){
         return next(new UserSelfReferenceError())
+    }
+    if(user.invitesReceived.every(friend => friend._id.toString() !== idFriend)){
+        return next(new FriendError())
     }
 
     User.findOneAndUpdate(
         {
-            _id: id,
-            invitesSent: {$eq: _id}
+            _id: idFriend,
+            invitesSent: {$eq: idUser}
         },
-        {$pull: {invitesSent: _id}},
+        {$pull: {invitesSent: idUser}},
         {new: true}
     
     ).then(userDeclined => {
         if(!userDeclined) {
             throw new FriendError()
         }
-        User.findOneAndUpdate(
-            {
-                _id,
-                invitesReceived: {$eq: id}
-            },
-            {$pull: {invitesReceived: id}},
-            {new: true}
-            
-        ).then(user => {
+
+        user.invitesReceived.splice(user.invitesReceived.findIndex(user => user._id.toString()===idFriend), 1)
+        return user.save().then(user => {
             if(!user) {
                 throw new FriendError()
             }
             res.status(200).json({user: userDeclined})
-
-        }).catch(err => next(err))
+        })
 
     }).catch(err => next(err))
 })
 
 router.patch("/:id/friend/accept", authenticationCheck, (req, res, next) => {
-    const {id} = req.params
-    const {_id} = req.user
+    const {
+        params: {id: idFriend},
+        user,
+        user: {_id: idUser}
+    } = req
 
-    if(id===_id.toString()){
+    if(idFriend===idUser.toString()){
         return next(new UserSelfReferenceError())
+    }
+    if(user.invitesReceived.every(friend => friend._id.toString() !== idFriend)){
+        return next(new FriendError())
     }
 
     User.findOneAndUpdate(
         {
-            _id: id,
-            invitesSent: {$eq: _id}
+            _id: idFriend,
+            invitesSent: {$eq: idUser}
         },
         {
-            $pull: {invitesSent: _id},
-            $push: {friends: _id}
-
+            $pull: {invitesSent: idUser},
+            $push: {friends: idUser}
         },
         {new: true}
     
@@ -195,102 +198,91 @@ router.patch("/:id/friend/accept", authenticationCheck, (req, res, next) => {
         if(!userAccepted) {
             throw new FriendError()
         }
-        User.findOneAndUpdate(
-            {
-                _id,
-                invitesReceived: {$eq: id}
-            },
-            {
-                $pull: {invitesReceived: id},
-                $push: {friends: id}
-            },
-            {new: true}
-            
-        ).then(user => {
+
+        user.invitesReceived.splice(user.invitesReceived.findIndex(user => user._id.toString()===idFriend), 1)
+        user.friends.push(idFriend)
+        return user.save().then(user => {
             if(!user) {
                 throw new FriendError()
             }
             res.status(200).json({user: userAccepted})
-
-        }).catch(err => next(err))
+        })
 
     }).catch(err => next(err))
 })
 
 router.patch("/:id/friend/remove", authenticationCheck, (req, res, next) => {
-    const {id} = req.params
-    const {_id} = req.user
+    const {
+        params: {id: idFriend},
+        user,
+        user: {_id: idUser}
+    } = req
 
-    if(id===_id.toString()){
+    if(idFriend===idUser.toString()){
         return next(new UserSelfReferenceError())
+    }
+    if(user.friends.every(friend => friend._id.toString() !== idFriend)){
+        return next(new FriendError())
     }
 
     User.findOneAndUpdate(
         {
-            _id: id,
-            friends: {$eq: _id}
+            _id: idFriend,
+            friends: {$eq: idUser}
         },
-        {$pull: {friends: _id}},
+        {$pull: {friends: idUser}},
         {new: true}
     
     ).then(userRemoved => {
         if(!userRemoved) {
             throw new FriendError()
         }
-        User.findOneAndUpdate(
-            {
-                _id,
-                friends: {$eq: id}
-            },
-            {$pull: {friends: id}},
-            {new: true}
-            
-        ).then(user => {
+
+        user.friends.splice(user.friends.findIndex(user => user._id.toString()===idFriend), 1)
+        return user.save().then(user => {
             if(!user) {
                 throw new FriendError()
             }
             res.status(200).json({user: userRemoved})
-
-        }).catch(err => next(err))
+        })
 
     }).catch(err => next(err))
 })
 
 router.patch("/:id/friend/cancel", authenticationCheck, (req, res, next) => {
-    const {id} = req.params
-    const {_id} = req.user
+    const {
+        params: {id: idFriend},
+        user,
+        user: {_id: idUser}
+    } = req
 
-    if(id===_id.toString()){
+    if(idFriend===idUser.toString()){
         return next(new UserSelfReferenceError())
+    }
+    if(user.invitesSent.every(friend => friend._id.toString() !== idFriend)){
+        return next(new FriendError())
     }
 
     User.findOneAndUpdate(
         {
-            _id: id,
-            invitesReceived: {$eq: _id}
+            _id: idFriend,
+            invitesReceived: {$eq: idUser}
         },
-        {$pull: {invitesReceived: _id}},
+        {$pull: {invitesReceived: idUser}},
         {new: true}
     
     ).then(userRemoved => {
         if(!userRemoved) {
             throw new FriendError()
         }
-        User.findOneAndUpdate(
-            {
-                _id,
-                invitesSent: {$eq: id}
-            },
-            {$pull: {invitesSent: id}},
-            {new: true}
-            
-        ).then(user => {
+
+        user.invitesSent.splice(user.invitesSent.findIndex(user => user._id.toString()===idFriend), 1)
+        return user.save().then(user => {
             if(!user) {
                 throw new FriendError()
             }
             res.status(200).json({user: userRemoved})
-
-        }).catch(err => next(err))
+        })
 
     }).catch(err => next(err))
 })

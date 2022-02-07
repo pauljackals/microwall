@@ -13,8 +13,9 @@ const sio = new Server(server, {
     }
 })
 
-sio.ofWrapped = function(namespaceName) {
-    const namespace = this.of(namespaceName)
+sio.ofOriginal = sio.of
+sio.of = function(namespaceName) {
+    const namespace = this.ofOriginal(namespaceName)
     namespace.use(wrapMiddleware(expressSession))
     namespace.use(wrapMiddleware(passport.initialize()))
     namespace.use(wrapMiddleware(passport.session()))

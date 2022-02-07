@@ -69,9 +69,9 @@ router.post("/:id", authenticationCheck, accessPost, (req, res, next) => {
         return post.save().then(() => {
             if(req.user._id.toString()!==post.user._id.toString()) {
                 const isPrivate = post.access!==POST_ACCESS_ENUM.GENERAL ? undefined : !!post.commentsPrivate
-                sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
+                sio.of(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
             }
-            sio.ofWrapped(`/post/${post._id}`).emit("comment", JSON.stringify({comment}))
+            sio.of(`/post/${post._id}`).emit("comment", JSON.stringify({comment}))
             res.status(201).json({comment})
         })
         
