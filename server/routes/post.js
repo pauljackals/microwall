@@ -37,15 +37,16 @@ router.post("/", authenticationCheck, (req, res, next) => {
     const userId = req.user._id
 
     const post = new Post({text, access, user: userId, links, images})
+    
     post.save().then(post => {
-        User.findByIdAndUpdate(userId, {$push: {
+        return User.findByIdAndUpdate(userId, {$push: {
             posts: post._id
         
         }}).exec().then(() => {
             post.user = req.user
             res.status(201).json({post})
+        })
         
-        }).catch(err => next(err))
     }).catch(err => next(err))
 })
 
@@ -58,21 +59,21 @@ router.post("/:id", authenticationCheck, accessPost, (req, res, next) => {
     const {post, body: {text}} = req
 
     const comment = new Comment({text, user: req.user._id, post: post._id})
+
     comment.save().then(comment => {
         if(post.commentsPrivate) {
             post.commentsPrivate.unshift(comment._id)
         } else {
             post.commentsPublic.unshift(comment._id)
         }
-        post.save().then(() => {
+        return post.save().then(() => {
             if(req.user._id.toString()!==post.user._id.toString()) {
                 const isPrivate = post.access!==POST_ACCESS_ENUM.GENERAL ? undefined : !!post.commentsPrivate
                 sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
             }
             sio.ofWrapped(`/post/${post._id}`).emit("comment", JSON.stringify({comment}))
             res.status(201).json({comment})
-            
-        }).catch(err => next(err))
+        })
         
     }).catch(err => next(err))
 })
