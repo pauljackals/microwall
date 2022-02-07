@@ -3,7 +3,6 @@ const Post = require("../models/Post")
 const User = require("../models/User")
 const {authenticationCheck, accessPost} = require("../utils/middlewares")
 const { POST_ACCESS_ENUM } = require("../models/types")
-const {NotFoundError} = require("../utils/errors")
 const Comment = require("../models/Comment")
 const sio = require("../namespaces/namespaces")
 
@@ -55,54 +54,26 @@ router.get("/:id", authenticationCheck, accessPost, (req, res) => {
     res.status(200).json({post})
 })
 
-router.post("/:id", authenticationCheck, (req, res, next) => {
-    const {id} = req.params
-    const {text} = req.body
+router.post("/:id", authenticationCheck, accessPost, (req, res, next) => {
+    const {post, body: {text}} = req
 
-    const isPrivateRaw = req.query.isPrivate
-    if(!["true", "false", undefined].includes(isPrivateRaw)) {
-        return next(new NotFoundError())
-    }
-    const isPrivate = !isPrivateRaw ? undefined : !!(isPrivateRaw==="true")
-
-    Post.findOne({$or: [
-        {
-            _id: id,
-            access: {$in: [
-                POST_ACCESS_ENUM.PUBLIC,
-                ...(!isPrivate ? [POST_ACCESS_ENUM.GENERAL] : [])
-            ]}
-        },
-        {
-            _id: id,
-            access: {$in: [
-                POST_ACCESS_ENUM.PRIVATE,
-                ...(isPrivate ? [POST_ACCESS_ENUM.GENERAL] : [])
-            ]},
-            user: {$in: [req.user._id, ...req.user.friends.map(friend => friend._id)]}
+    const comment = new Comment({text, user: req.user._id, post: post._id})
+    comment.save().then(comment => {
+        if(post.commentsPrivate) {
+            post.commentsPrivate.unshift(comment._id)
+        } else {
+            post.commentsPublic.unshift(comment._id)
         }
-
-    ]}).populate("commentsPublic commentsPrivate").exec().then(post => {
-        if(!post || post.access===POST_ACCESS_ENUM.GENERAL && isPrivate===undefined) {
-            throw new NotFoundError()
-        }
-        const comment = new Comment({text, user: req.user._id, post: id})
-        comment.save().then(comment => {
-            if(post.access===POST_ACCESS_ENUM.PRIVATE || post.access===POST_ACCESS_ENUM.GENERAL && isPrivate) {
-                post.commentsPrivate.unshift(comment._id)
-            } else {
-                post.commentsPublic.unshift(comment._id)
+        post.save().then(() => {
+            if(req.user._id.toString()!==post.user._id.toString()) {
+                const isPrivate = post.access!==POST_ACCESS_ENUM.GENERAL ? undefined : !!post.commentsPrivate
+                sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
             }
-            post.save().then(() => {
-                if(req.user._id.toString()!==post.user._id.toString()) {
-                    sio.ofWrapped(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
-                }
-                sio.ofWrapped(`/post/${post._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
-                res.status(201).json({comment})
-            })
+            sio.ofWrapped(`/post/${post._id}`).emit("comment", JSON.stringify({comment}))
+            res.status(201).json({comment})
             
         }).catch(err => next(err))
-
+        
     }).catch(err => next(err))
 })
 
