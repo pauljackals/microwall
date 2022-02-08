@@ -3,7 +3,7 @@ const AuthenticationError = require("passport/lib/errors/authenticationerror")
 const { accessPost } = require("../utils/middlewares")
 
 sio.of(/^\/user\/[a-fA-F0-9]{24}$/).use((socket, next) => {
-    if(socket.request.user._id.toString() !== socket.nsp.name.slice(6)) {
+    if(socket.request.user._id.toString() !== socket.nsp.name.split("/")[2]) {
         return next(new AuthenticationError())
     }
     next()

@@ -24,6 +24,6 @@
   "scripts": {
     "start": "nodemon",
     "production": "NODE_ENV=production node index.js",
-    "production_win": "set \"NODE_ENV=production\" && node index.js"
+    "productionWin": "set \"NODE_ENV=production\" && node index.js"
   }
 }

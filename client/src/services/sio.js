@@ -2,18 +2,22 @@ import {io} from "socket.io-client"
 import isDevelopment from "../utils/isDevelopment"
 
 const baseURL = isDevelopment ? `http://localhost:5000` : ''
+const baseOptions = {
+    withCredentials: true
+}
+const ioConfigured = (url, options={}) => io(`${baseURL}${url}`, {
+    ...baseOptions,
+    ...options
+})
 
 export default {
     listenToUser(id) {
-        const sio = io(`${baseURL}/user/${id}`, {withCredentials: true})
-        return sio
+        return ioConfigured(`/user/${id}`)
     },
     listenToPost(id, isPrivate) {
-        const sio = io(`${baseURL}/post/${id}`, {
-            withCredentials: true,
+        return ioConfigured(`/post/${id}`, {
             forceNew: true,
             query: isPrivate!==undefined ? {isPrivate} : {}
         })
-        return sio
     }
 }
