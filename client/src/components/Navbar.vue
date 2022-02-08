@@ -9,7 +9,10 @@
                 <router-link :to="{name: 'Register'}" class="button is-dark">register</router-link>
             </div>
             <div class="wrapper-inline" v-else>
-                <router-link :to="{name: 'Friends'}" class="button is-dark">friends</router-link>
+                <router-link :to="{name: 'Friends'}" class="button is-dark">
+                    friends
+                    <span class="notification-counter" v-if="user.invitesReceived && user.invitesReceived.length">{{user.invitesReceived.length}}</span>
+                </router-link>
                 <router-link :to="{name: 'Profile', params: {id: 'me'} }" class="button is-dark">{{user.username}}</router-link>
                 <LogoutButton class="button is-dark"/>
             </div>
@@ -49,5 +52,12 @@ a:not(:last-child) {
 }
 .title {
     text-align: center;
+}
+.notification-counter {
+    background-color: red;
+    padding: 0 7px;
+    border-radius: 25%;
+    margin-left: 5px;
+    color: white;
 }
 </style>

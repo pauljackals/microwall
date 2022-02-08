@@ -2,12 +2,14 @@ const User = require("../models/User")
 const {authenticationCheck} = require("../utils/middlewares")
 const router = require("express").Router()
 const { POST_ACCESS_ENUM } = require("../models/types")
+const sio = require("../namespaces/namespaces")
 
 const {
     NotFoundError,
     UserSelfReferenceError,
     FriendError
 } = require("../utils/errors")
+const { filterFriend } = require("../utils/functions")
 
 router.get("/me", authenticationCheck, (req, res) => {
     const user = req.user
@@ -125,6 +127,7 @@ router.patch("/:id/friend/add", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
+            sio.of(`/user/${idFriend}`).emit("friendAdd", JSON.stringify({user: filterFriend(user)}))
             res.status(200).json({user: userInvited})
         })
 
@@ -163,6 +166,7 @@ router.patch("/:id/friend/decline", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
+            sio.of(`/user/${idFriend}`).emit("friendDecline", JSON.stringify({user: filterFriend(user)}))
             res.status(200).json({user: userDeclined})
         })
 
@@ -205,6 +209,7 @@ router.patch("/:id/friend/accept", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
+            sio.of(`/user/${idFriend}`).emit("friendAccept", JSON.stringify({user: filterFriend(user)}))
             res.status(200).json({user: userAccepted})
         })
 
@@ -243,6 +248,7 @@ router.patch("/:id/friend/remove", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
+            sio.of(`/user/${idFriend}`).emit("friendRemove", JSON.stringify({user: filterFriend(user)}))
             res.status(200).json({user: userRemoved})
         })
 
@@ -281,6 +287,7 @@ router.patch("/:id/friend/cancel", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
+            sio.of(`/user/${idFriend}`).emit("friendCancel", JSON.stringify({user: filterFriend(user)}))
             res.status(200).json({user: userRemoved})
         })
 

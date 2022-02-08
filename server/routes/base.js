@@ -1,7 +1,7 @@
 const passport = require("passport")
 const User = require("../models/User")
 const {authenticationCheck} = require("../utils/middlewares")
-const { makeUserSafe } = require("../utils/functions")
+const { filterUserPassword } = require("../utils/functions")
 const router = require("express").Router()
 
 router.post("/register", (req, res, next) => {
@@ -21,7 +21,7 @@ router.post("/register", (req, res, next) => {
         if(err) {
             return next(err)
         }
-        const user = makeUserSafe(userSaved)
+        const user = filterUserPassword(userSaved)
         res.status(201).json({user})
     })
 })
@@ -38,7 +38,7 @@ router.post("/login", (req, res, next) => {
             if(err) {
                 return next(err)
             }
-            const userSafe = makeUserSafe(user)
+            const userSafe = filterUserPassword(user)
             res.status(201).json({user: userSafe})
         })
     })(req, res, next)

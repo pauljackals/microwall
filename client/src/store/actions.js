@@ -13,7 +13,7 @@ import {
     GET_POST,
     COMMENT_CURRENT_POST
 } from "./types/actions"
-import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, SET_CURRENT_POST, SET_CURRENT_POST_SOCKET, SET_USER, SET_USER_SOCKET, UPDATE_USER } from "./types/mutations"
+import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, FRIENDS_ADD_USER, FRIENDS_REMOVE_USER, INVITES_RECEIVED_ADD_USER, INVITES_RECEIVED_REMOVE_USER, INVITES_SENT_ADD_USER, INVITES_SENT_REMOVE_USER, SET_CURRENT_POST, SET_CURRENT_POST_SOCKET, SET_USER, SET_USER_SOCKET, UPDATE_USER } from "./types/mutations"
 import api from "../services/api"
 import {USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
@@ -24,6 +24,27 @@ const listenToUser = (commit, id) => {
     socket.on("comment", payloadRaw => {
         const {comment, isPrivate} = JSON.parse(payloadRaw)
         commit(ADD_COMMENT_TO_USER, {comment, isPrivate})
+    })
+
+    socket.on("friendAdd", payloadRaw => {
+        const {user} = JSON.parse(payloadRaw)
+        commit(INVITES_RECEIVED_ADD_USER, {user})
+    })
+    socket.on("friendDecline", payloadRaw => {
+        const {user} = JSON.parse(payloadRaw)
+        commit(INVITES_SENT_REMOVE_USER, {user})
+    })
+    socket.on("friendAccept", payloadRaw => {
+        const {user} = JSON.parse(payloadRaw)
+        commit(FRIENDS_ADD_USER, {user})
+    })
+    socket.on("friendRemove", payloadRaw => {
+        const {user} = JSON.parse(payloadRaw)
+        commit(FRIENDS_REMOVE_USER, {user})
+    })
+    socket.on("friendCancel", payloadRaw => {
+        const {user} = JSON.parse(payloadRaw)
+        commit(INVITES_RECEIVED_REMOVE_USER, {user})
     })
 
     return socket
@@ -79,54 +100,38 @@ export default {
         })
     },
 
-    [INVITE_FRIEND]({commit, state}, {_id}) {
+    [INVITE_FRIEND]({commit}, {_id}) {
         return api.inviteFriend(_id).then(response => {
-            commit(UPDATE_USER, {
-                invitesSent: [
-                    ...state[USER].invitesSent,
-                    response.data.user
-                ]
-            })
+            const {user} = response.data
+            commit(INVITES_SENT_ADD_USER, {user})
         })
     },
 
-    [DECLINE_FRIEND]({commit, state}, {_id}) {
+    [DECLINE_FRIEND]({commit}, {_id}) {
         return api.declineFriend(_id).then(response => {
-            const {_id} = response.data.user
-            commit(UPDATE_USER, {
-                invitesReceived: state[USER].invitesReceived.filter(user => user._id !== _id)
-            })
+            const {user} = response.data
+            commit(INVITES_RECEIVED_REMOVE_USER, {user})
         })
     },
 
-    [REMOVE_FRIEND]({commit, state}, {_id}) {
+    [REMOVE_FRIEND]({commit}, {_id}) {
         return api.removeFriend(_id).then(response => {
-            const {_id} = response.data.user
-            commit(UPDATE_USER, {
-                friends: state[USER].friends.filter(user => user._id !== _id)
-            })
+            const {user} = response.data
+            commit(FRIENDS_REMOVE_USER, {user})
         })
     },
 
-    [ACCEPT_FRIEND]({commit, state}, {_id}) {
+    [ACCEPT_FRIEND]({commit}, {_id}) {
         return api.acceptFriend(_id).then(response => {
-            const friend = response.data.user
-            commit(UPDATE_USER, {
-                invitesReceived: state[USER].invitesReceived.filter(user => user._id !== friend._id),
-                friends: [
-                    ...state[USER].friends,
-                    friend
-                ]
-            })
+            const {user} = response.data
+            commit(FRIENDS_ADD_USER, {user})
         })
     },
 
-    [CANCEL_FRIEND]({commit, state}, {_id}) {
+    [CANCEL_FRIEND]({commit}, {_id}) {
         return api.cancelFriend(_id).then(response => {
-            const {_id} = response.data.user
-            commit(UPDATE_USER, {
-                invitesSent: state[USER].invitesSent.filter(user => user._id !== _id)
-            })
+            const {user} = response.data
+            commit(INVITES_SENT_REMOVE_USER, {user})
         })
     },
 
