@@ -11,6 +11,11 @@ const {
 } = require("../utils/errors")
 const { filterFriend } = require("../utils/functions")
 
+router.get("/test", (req, res) => {
+    sio.of("/user/62015bdc32a1fc8fbcce4f90").fetchSockets().then(x => console.log(x[0].client.conn.request))
+    res.json()
+})
+
 router.get("/me", authenticationCheck, (req, res) => {
     const user = req.user
 
@@ -127,7 +132,7 @@ router.patch("/:id/friend/add", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
-            sio.of(`/user/${idFriend}`).emit("friendAdd", JSON.stringify({user: filterFriend(user)}))
+            sio.of(`/user/${idFriend}`).emit("friendAdd", {user: filterFriend(user)})
             res.status(200).json({user: userInvited})
         })
 
@@ -166,7 +171,7 @@ router.patch("/:id/friend/decline", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
-            sio.of(`/user/${idFriend}`).emit("friendDecline", JSON.stringify({user: filterFriend(user)}))
+            sio.of(`/user/${idFriend}`).emit("friendDecline", {user: filterFriend(user)})
             res.status(200).json({user: userDeclined})
         })
 
@@ -209,7 +214,7 @@ router.patch("/:id/friend/accept", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
-            sio.of(`/user/${idFriend}`).emit("friendAccept", JSON.stringify({user: filterFriend(user)}))
+            sio.of(`/user/${idFriend}`).emit("friendAccept", {user: filterFriend(user)})
             res.status(200).json({user: userAccepted})
         })
 
@@ -248,7 +253,7 @@ router.patch("/:id/friend/remove", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
-            sio.of(`/user/${idFriend}`).emit("friendRemove", JSON.stringify({user: filterFriend(user)}))
+            sio.of(`/user/${idFriend}`).emit("friendRemove", {user: filterFriend(user)})
             res.status(200).json({user: userRemoved})
         })
 
@@ -287,7 +292,7 @@ router.patch("/:id/friend/cancel", authenticationCheck, (req, res, next) => {
             if(!user) {
                 throw new FriendError()
             }
-            sio.of(`/user/${idFriend}`).emit("friendCancel", JSON.stringify({user: filterFriend(user)}))
+            sio.of(`/user/${idFriend}`).emit("friendCancel", {user: filterFriend(user)})
             res.status(200).json({user: userRemoved})
         })
 

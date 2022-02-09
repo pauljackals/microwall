@@ -19,5 +19,14 @@ export default {
             forceNew: true,
             query: isPrivate!==undefined ? {isPrivate} : {}
         })
+    },
+    listenToMainWall() {
+        return ioConfigured("/post")
+    },
+    listenToPublicWall(id) {
+        return ioConfigured(`/user/${id}/public`)
+    },
+    listenToPrivateWall(id) {
+        return ioConfigured(`/user/${id}/private`)
     }
 }

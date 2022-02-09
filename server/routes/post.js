@@ -5,6 +5,7 @@ const {authenticationCheck, accessPost} = require("../utils/middlewares")
 const { POST_ACCESS_ENUM } = require("../models/types")
 const Comment = require("../models/Comment")
 const sio = require("../namespaces/namespaces")
+const { filterFriend } = require("../utils/functions")
 
 router.get("/", (req, res, next) => {
     const isAuthenticated = req.isAuthenticated()
@@ -45,6 +46,18 @@ router.post("/", authenticationCheck, (req, res, next) => {
         }}).exec().then(() => {
             post.user = req.user
             res.status(201).json({post})
+
+            post.user = filterFriend(post.user)
+            if(post.access !== POST_ACCESS_ENUM.PUBLIC) {
+                sio.of(`/user/${userId}/private`).emit("post", {post})
+            }
+            if(post.access !== POST_ACCESS_ENUM.PRIVATE) {
+                if(post.access===POST_ACCESS_ENUM.GENERAL) {
+                    post.commentsPrivate=undefined
+                }
+                sio.of("/post").emit("post", {post})
+                sio.of(`/user/${userId}/public`).emit("post", {post})
+            }
         })
         
     }).catch(err => next(err))
@@ -69,9 +82,9 @@ router.post("/:id", authenticationCheck, accessPost, (req, res, next) => {
         return post.save().then(() => {
             if(req.user._id.toString()!==post.user._id.toString()) {
                 const isPrivate = post.access!==POST_ACCESS_ENUM.GENERAL ? undefined : !!post.commentsPrivate
-                sio.of(`/user/${post.user._id}`).emit("comment", JSON.stringify({comment, isPrivate}))
+                sio.of(`/user/${post.user._id}`).emit("comment", {comment, isPrivate})
             }
-            sio.of(`/post/${post._id}`).emit("comment", JSON.stringify({comment}))
+            sio.of(`/post/${post._id}`).emit("comment", {comment})
             res.status(201).json({comment})
         })
         

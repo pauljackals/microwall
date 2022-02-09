@@ -3,6 +3,7 @@ const User = require("../models/User")
 const {authenticationCheck} = require("../utils/middlewares")
 const { filterUserPassword } = require("../utils/functions")
 const router = require("express").Router()
+const sio = require("../namespaces/namespaces")
 
 router.post("/register", (req, res, next) => {
     const {
@@ -45,9 +46,22 @@ router.post("/login", (req, res, next) => {
 })
 
 router.delete("/logout", authenticationCheck, (req, res) => {
+    const {
+        sessionID,
+        user: {_id}
+    } = req
+    
     req.logout()
     req.session.destroy(() => {
         res.clearCookie("connect.sid");
+
+        sio.of(`/user/${_id}`).fetchSockets().then(sockets => {
+            const socket = sockets.find(socket => socket.client.conn.request.sessionID === sessionID)
+            if(socket) {
+                socket.disconnect(true)
+            }
+        })
+
         res.status(200).json({message: "logged out"})
     })
     

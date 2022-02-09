@@ -1,5 +1,5 @@
-import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, SET_CURRENT_POST_SOCKET, INVITES_SENT_ADD_USER, INVITES_RECEIVED_ADD_USER, INVITES_SENT_REMOVE_USER, INVITES_RECEIVED_REMOVE_USER, FRIENDS_REMOVE_USER, FRIENDS_ADD_USER } from "./types/mutations"
-import {CURRENT_POST, CURRENT_POST_SOCKET, USER, USER_SOCKET} from "./types/state"
+import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, INVITES_SENT_ADD_USER, INVITES_RECEIVED_ADD_USER, INVITES_SENT_REMOVE_USER, INVITES_RECEIVED_REMOVE_USER, FRIENDS_REMOVE_USER, FRIENDS_ADD_USER, SET_MAIN_WALL_POSTS, ADD_MAIN_WALL_POSTS, CLEAR_MAIN_WALL_POSTS } from "./types/mutations"
+import {CURRENT_POST, CURRENT_POST_SOCKET, MAIN_WALL_POSTS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
 const friendsRemoveUser = friendsType => (state, {user}) => {
@@ -59,8 +59,9 @@ export default {
     },
     [FRIENDS_REMOVE_USER]: friendsRemoveUser("friends"),
 
-    [SET_CURRENT_POST](state, {post}) {
+    [SET_CURRENT_POST](state, {post, socket}) {
         state[CURRENT_POST] = post
+        state[CURRENT_POST_SOCKET] = socket
     },
     [CLEAR_CURRENT_POST](state) {
         state[CURRENT_POST] = {}
@@ -69,9 +70,6 @@ export default {
             state[CURRENT_POST_SOCKET] = null
         }
     },
-    [SET_CURRENT_POST_SOCKET](state, {socket}) {
-        state[CURRENT_POST_SOCKET] = socket
-    },
     [ADD_COMMENT_TO_CURRENT_POST](state, {comment}) {
         const currentPost = state[CURRENT_POST]
         if(currentPost.commentsPublic) {
@@ -79,5 +77,21 @@ export default {
         } else {
             currentPost.commentsPrivate.unshift(comment)
         }
+    },
+
+    [SET_MAIN_WALL_POSTS](state, {posts, sockets}) {
+        state[MAIN_WALL_POSTS] = posts
+        state[MAIN_WALL_POSTS_SOCKETS] = sockets
+    },
+    [ADD_MAIN_WALL_POSTS](state, {post}) {
+        state[MAIN_WALL_POSTS] = [
+            post,
+            ...state[MAIN_WALL_POSTS]
+        ]
+    },
+    [CLEAR_MAIN_WALL_POSTS](state) {
+        state[MAIN_WALL_POSTS] = []
+        state[MAIN_WALL_POSTS_SOCKETS].forEach(socket => socket.close())
+        state[MAIN_WALL_POSTS_SOCKETS] = []
     }
 }

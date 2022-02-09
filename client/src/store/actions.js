@@ -11,39 +11,50 @@ import {
     CANCEL_FRIEND,
     ADD_POST,
     GET_POST,
-    COMMENT_CURRENT_POST
+    COMMENT_CURRENT_POST,
+    GET_MAIN_WALL_POSTS
 } from "./types/actions"
-import { ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, CLEAR_USER, FRIENDS_ADD_USER, FRIENDS_REMOVE_USER, INVITES_RECEIVED_ADD_USER, INVITES_RECEIVED_REMOVE_USER, INVITES_SENT_ADD_USER, INVITES_SENT_REMOVE_USER, SET_CURRENT_POST, SET_CURRENT_POST_SOCKET, SET_USER, SET_USER_SOCKET, UPDATE_USER } from "./types/mutations"
+import {
+    ADD_COMMENT_TO_CURRENT_POST,
+    ADD_COMMENT_TO_USER,
+    ADD_MAIN_WALL_POSTS,
+    CLEAR_USER, FRIENDS_ADD_USER,
+    FRIENDS_REMOVE_USER,
+    INVITES_RECEIVED_ADD_USER,
+    INVITES_RECEIVED_REMOVE_USER,
+    INVITES_SENT_ADD_USER,
+    INVITES_SENT_REMOVE_USER,
+    SET_CURRENT_POST,
+    SET_MAIN_WALL_POSTS,
+    SET_USER,
+    SET_USER_SOCKET,
+    UPDATE_USER
+} from "./types/mutations"
 import api from "../services/api"
 import {USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
+import {POST_ACCESS_ENUM} from "../utils/types"
 
 const listenToUser = (commit, id) => {
     const socket = sio.listenToUser(id)
 
-    socket.on("comment", payloadRaw => {
-        const {comment, isPrivate} = JSON.parse(payloadRaw)
+    socket.on("comment", ({comment, isPrivate}) => {
         commit(ADD_COMMENT_TO_USER, {comment, isPrivate})
     })
 
-    socket.on("friendAdd", payloadRaw => {
-        const {user} = JSON.parse(payloadRaw)
+    socket.on("friendAdd", ({user}) => {
         commit(INVITES_RECEIVED_ADD_USER, {user})
     })
-    socket.on("friendDecline", payloadRaw => {
-        const {user} = JSON.parse(payloadRaw)
+    socket.on("friendDecline", ({user}) => {
         commit(INVITES_SENT_REMOVE_USER, {user})
     })
-    socket.on("friendAccept", payloadRaw => {
-        const {user} = JSON.parse(payloadRaw)
+    socket.on("friendAccept", ({user}) => {
         commit(FRIENDS_ADD_USER, {user})
     })
-    socket.on("friendRemove", payloadRaw => {
-        const {user} = JSON.parse(payloadRaw)
+    socket.on("friendRemove", ({user}) => {
         commit(FRIENDS_REMOVE_USER, {user})
     })
-    socket.on("friendCancel", payloadRaw => {
-        const {user} = JSON.parse(payloadRaw)
+    socket.on("friendCancel", ({user}) => {
         commit(INVITES_RECEIVED_REMOVE_USER, {user})
     })
 
@@ -96,7 +107,7 @@ export default {
     [UPDATE_USER_LOGIN]({commit}, {password, passwordOld}) {
         return api.updateUserLogin(password, passwordOld).then(response => {
             // const {} = response.data.user
-            commit(UPDATE_USER, {})
+            // commit(UPDATE_USER, {})
         })
     },
 
@@ -146,16 +157,13 @@ export default {
     [GET_POST]({commit, state}, {_id, isPrivate}) {
         return api.getPost(_id, isPrivate).then(response => {
             const {post} = response.data
-            commit(SET_CURRENT_POST, {post})
             
-            const socket = sio.listenToPost(post._id, isPrivate)
-            socket.on("comment", payloadRaw => {
-                const {comment} = JSON.parse(payloadRaw)
+            const socket = sio.listenToPost(post._id, isPrivate).on("comment", ({comment}) => {
                 if(comment.user._id!==state[USER]._id) {
                     commit(ADD_COMMENT_TO_CURRENT_POST, {comment})
                 }
             })
-            commit(SET_CURRENT_POST_SOCKET, {socket})
+            commit(SET_CURRENT_POST, {post, socket})
         })
     },
 
@@ -166,6 +174,25 @@ export default {
             if(state[USER]._id===comment.user._id) {
                 commit(ADD_COMMENT_TO_USER, {comment, isPrivate})
             }
+        })
+    },
+
+    [GET_MAIN_WALL_POSTS]({commit, state}) {
+        return api.getPosts().then(response => {
+            const {posts} = response.data
+            const sockets = (state[USER].friends ?? [])
+                .map(friend => sio.listenToPrivateWall(friend._id).on("post", ({post}) => {
+                    commit(ADD_MAIN_WALL_POSTS, {post})
+                }))
+                .concat(sio.listenToMainWall().on("post", ({post}) => {
+                    const friendsIds = (state[USER].friends ?? []).map(friend => friend._id)
+                    if(post.access===POST_ACCESS_ENUM.GENERAL && friendsIds[0] && friendsIds.find(friend => friend===post.user._id)) {
+                        return
+                    }
+                    commit(ADD_MAIN_WALL_POSTS, {post})
+                }))
+
+            commit(SET_MAIN_WALL_POSTS, {posts, sockets})
         })
     }
 }

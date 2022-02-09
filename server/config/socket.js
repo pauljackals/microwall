@@ -4,7 +4,7 @@ const expressSession = require("./session")
 const server = require("./server")
 const isDevelopment = require("./isDevelopment")
 const { wrapMiddleware } = require("../utils/functions")
-const { authenticationCheck } = require("../utils/middlewares")
+// const { authenticationCheck } = require("../utils/middlewares")
 
 const sio = new Server(server, {
     cors: {
@@ -19,7 +19,7 @@ sio.of = function(namespaceName) {
     namespace.use(wrapMiddleware(expressSession))
     namespace.use(wrapMiddleware(passport.initialize()))
     namespace.use(wrapMiddleware(passport.session()))
-    namespace.use(wrapMiddleware(authenticationCheck))
+    // namespace.use(wrapMiddleware(authenticationCheck))
     return namespace
 }
 
