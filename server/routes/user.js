@@ -254,9 +254,13 @@ router.patch("/:id/friend/remove", authenticationCheck, (req, res, next) => {
                 throw new FriendError()
             }
             sio.of(`/user/${idFriend}`).emit("friendRemove", {user: filterFriend(user)})
-            sio.of(`/user/${idUser}/private`).fetchSockets().then(sockets => {
-                sockets.forEach(socket => socket.client.conn.request.user._id.toString()===idFriend && socket.disconnect())
+
+            const disconnectSockets = (idWall, idListener) => sio.of(`/user/${idWall}/private`).fetchSockets().then(sockets => {
+                sockets.forEach(socket => socket.client.conn.request.user._id.toString()===idListener && socket.disconnect())
             })
+            disconnectSockets(idUser, idFriend)
+            disconnectSockets(idFriend, idUser.toString())
+            
             res.status(200).json({user: userRemoved})
         })
 

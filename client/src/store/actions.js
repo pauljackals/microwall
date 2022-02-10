@@ -36,7 +36,7 @@ import {
     UPDATE_USER
 } from "./types/mutations"
 import api from "../services/api"
-import {CURRENT_USER_SOCKETS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
+import {CURRENT_USER, CURRENT_USER_SOCKETS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
@@ -60,7 +60,7 @@ const listenToUser = (commit, id, state) => {
         commit(INVITES_SENT_REMOVE_USER, {user})
     })
     socket.on("friendAccept", ({user}) => {
-        const mutation = state[CURRENT_USER_SOCKETS].public ? ADD_CURRENT_USER_POST
+        const mutation = state[CURRENT_USER]._id===user._id ? ADD_CURRENT_USER_POST
             : (state[MAIN_WALL_POSTS_SOCKETS].main ? ADD_MAIN_WALL_POSTS : undefined)
         if(mutation) {
             const socket = listenToPrivateWall(commit, mutation, user._id)
