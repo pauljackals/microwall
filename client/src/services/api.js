@@ -1,7 +1,7 @@
 import axios from "axios"
 import isDevelopment from "../utils/isDevelopment"
 
-axios.defaults.baseURL = isDevelopment ? `http://localhost:${process.env.VUE_APP_SERVER_PORT}` : "/api"
+axios.defaults.baseURL = isDevelopment ? `http://localhost:${process.env.VUE_APP_SERVER_PORT || 5000}` : "/api"
 axios.defaults.withCredentials = true
 axios.defaults.credentials = "include"
 

@@ -5,17 +5,17 @@
             <span v-if="error" class="error">{{error}}</span>
 
             <FormFieldErrors :field="user.username"/>
-            <FormField :field="user.username"/>
+            <FormField :field="user.username" v-model="user.username.value"/>
 
             <FormFieldErrors :field="user.password"/>
-            <FormField :field="user.password"/>
-            <FormField :field="passwordRepeat"/>
+            <FormField :field="user.password" v-model="user.password.value"/>
+            <FormField :field="passwordRepeat" v-model="passwordRepeat.value"/>
 
             <FormFieldErrors :field="user.firstName"/>
-            <FormField :field="user.firstName"/>
+            <FormField :field="user.firstName" v-model="user.firstName.value"/>
 
             <FormFieldErrors :field="user.lastName"/>
-            <FormField :field="user.lastName"/>
+            <FormField :field="user.lastName" v-model="user.lastName.value"/>
 
             <input type="submit" value="register" class="button is-info">
         </form>

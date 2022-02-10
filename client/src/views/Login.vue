@@ -5,10 +5,10 @@
             <span v-if="error" class="error">{{error}}</span>
 
             <FormFieldErrors :field="user.username"/>
-            <FormField :field="user.username"/>
+            <FormField :field="user.username" v-model="user.username.value"/>
 
             <FormFieldErrors :field="user.password"/>
-            <FormField :field="user.password"/>
+            <FormField :field="user.password" v-model="user.password.value"/>
 
             <input type="submit" value="log in" class="button is-info">
         </form>

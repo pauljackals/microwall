@@ -8,7 +8,7 @@ const { wrapMiddleware } = require("../utils/functions")
 
 const sio = new Server(server, {
     cors: {
-        origin: isDevelopment ? `http://localhost:${process.env.CLIENT_PORT || 8080}` : undefined,
+        origin: isDevelopment ? `http://localhost:${process.env.VUE_APP_CLIENT_PORT || 8080}` : undefined,
         credentials: true
     }
 })

@@ -1,5 +1,5 @@
 <template>
-    <input :type="field.type" v-model="field.value" :placeholder="field.name" class="input">
+    <input :type="field.type" :value="field.value" :placeholder="field.name" class="input" @input="$emit('update:modelValue', $event.target.value)">
 </template>
 
 <script>

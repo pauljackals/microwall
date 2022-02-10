@@ -8,11 +8,11 @@
             <span v-if="error" class="error">{{error}}</span>
 
             <FormFieldErrors :field="user.passwordOld"/>
-            <FormField :field="user.passwordOld"/>
+            <FormField :field="user.passwordOld" v-model="user.passwordOld.value"/>
 
             <FormFieldErrors :field="user.password"/>
-            <FormField :field="user.password"/>
-            <FormField :field="passwordRepeat"/>
+            <FormField :field="user.password" v-model="user.password.value"/>
+            <FormField :field="passwordRepeat" v-model="passwordRepeat.value"/>
 
             <input type="submit" value="update" class="button is-info">
         </form>

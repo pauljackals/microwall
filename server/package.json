@@ -23,7 +23,9 @@
   },
   "scripts": {
     "start": "nodemon",
-    "production": "NODE_ENV=production node index.js",
-    "productionWin": "set \"NODE_ENV=production\" && node index.js"
+    "prod": "node index.js",
+
+    "prodLocal": "NODE_ENV=production PROD_LOCAL=true node index.js",
+    "prodLocalWin": "set \"NODE_ENV=production\" && set \"PROD_LOCAL=true\" && node index.js"
   }
 }

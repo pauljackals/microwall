@@ -1,5 +1,5 @@
 const isDevelopment = require("./config/isDevelopment")
-if(isDevelopment || true) { // change when docker ready
+if(isDevelopment || process.env.PROD_LOCAL) {
     require("dotenv").config({path: "../.env"})
 }
 
@@ -25,7 +25,7 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
     credentials: true,
-    origin: isDevelopment ? `http://localhost:${process.env.CLIENT_PORT || 8080}` : undefined
+    origin: isDevelopment ? `http://localhost:${process.env.VUE_APP_CLIENT_PORT || 8080}` : undefined
 }))
 
 app.use(expressSession)
@@ -45,7 +45,7 @@ if(isDevelopment) {
 }
 app.use(errorHandler)
 
-const port = process.env.SERVER_PORT || (isDevelopment ? 5000 : 8443)
+const port = process.env.SERVER_PORT || 5000
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 })

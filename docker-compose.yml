@@ -12,6 +12,22 @@ services:
     volumes:
       - mongo-db:/data/db
       - mongo-configdb:/data/configdb
+    profiles:
+      - development
+      - production
+  app:
+    build: .
+    ports:
+      - ${SERVER_PORT:-5000}:5000
+    environment:
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - SERVER_SESSION_SECRET=${SERVER_SESSION_SECRET}
+      - MONGO_HOST=mongo
+      - NODE_ENV=production
+    profiles:
+      - production
 volumes:
   mongo-db:
   mongo-configdb:
