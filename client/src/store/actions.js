@@ -12,11 +12,13 @@ import {
     ADD_POST,
     GET_POST,
     COMMENT_CURRENT_POST,
-    GET_MAIN_WALL_POSTS
+    GET_MAIN_WALL_POSTS,
+    GET_CURRENT_USER
 } from "./types/actions"
 import {
     ADD_COMMENT_TO_CURRENT_POST,
     ADD_COMMENT_TO_USER,
+    ADD_CURRENT_USER_POST,
     ADD_MAIN_WALL_POSTS,
     CLEAR_USER, FRIENDS_ADD_USER,
     FRIENDS_REMOVE_USER,
@@ -25,6 +27,7 @@ import {
     INVITES_SENT_ADD_USER,
     INVITES_SENT_REMOVE_USER,
     SET_CURRENT_POST,
+    SET_CURRENT_USER,
     SET_MAIN_WALL_POSTS,
     SET_USER,
     SET_USER_SOCKET,
@@ -60,6 +63,8 @@ const listenToUser = (commit, id) => {
 
     return socket
 }
+
+const getFriendsIds = user => (user.friends ?? []).map(friend => friend._id)
 
 export default {
     [LOGIN]({commit}, {
@@ -185,14 +190,36 @@ export default {
                     commit(ADD_MAIN_WALL_POSTS, {post})
                 }))
                 .concat(sio.listenToMainWall().on("post", ({post}) => {
-                    const friendsIds = (state[USER].friends ?? []).map(friend => friend._id)
-                    if(post.access===POST_ACCESS_ENUM.GENERAL && friendsIds[0] && friendsIds.find(friend => friend===post.user._id)) {
+                    if(post.access===POST_ACCESS_ENUM.GENERAL && getFriendsIds(state[USER]).includes(post.user._id)) {
                         return
                     }
                     commit(ADD_MAIN_WALL_POSTS, {post})
                 }))
 
             commit(SET_MAIN_WALL_POSTS, {posts, sockets})
+        })
+    },
+
+    [GET_CURRENT_USER]({commit, state}, {_id}) {
+        return api.getUser(_id).then(response => {
+            const {user} = response.data
+
+            const sockets = {
+                public: sio.listenToPublicWall(_id).on("post", ({post}) => {
+                    if(post.access===POST_ACCESS_ENUM.GENERAL && getFriendsIds(state[USER]).includes(post.user._id)) {
+                        return
+                    }
+                    commit(ADD_CURRENT_USER_POST, {post})
+                }),
+                
+                private: getFriendsIds(state[USER]).includes(_id)
+                    ? sio.listenToPrivateWall(_id).on("post", ({post}) => {
+                        commit(ADD_CURRENT_USER_POST, {post})
+                    })
+                    : undefined
+            }
+
+            commit(SET_CURRENT_USER, {user, sockets})
         })
     }
 }

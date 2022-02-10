@@ -1,5 +1,5 @@
-import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, INVITES_SENT_ADD_USER, INVITES_RECEIVED_ADD_USER, INVITES_SENT_REMOVE_USER, INVITES_RECEIVED_REMOVE_USER, FRIENDS_REMOVE_USER, FRIENDS_ADD_USER, SET_MAIN_WALL_POSTS, ADD_MAIN_WALL_POSTS, CLEAR_MAIN_WALL_POSTS } from "./types/mutations"
-import {CURRENT_POST, CURRENT_POST_SOCKET, MAIN_WALL_POSTS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
+import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, INVITES_SENT_ADD_USER, INVITES_RECEIVED_ADD_USER, INVITES_SENT_REMOVE_USER, INVITES_RECEIVED_REMOVE_USER, FRIENDS_REMOVE_USER, FRIENDS_ADD_USER, SET_MAIN_WALL_POSTS, ADD_MAIN_WALL_POSTS, CLEAR_MAIN_WALL_POSTS, SET_CURRENT_USER, ADD_CURRENT_USER_POST, CLEAR_CURRENT_USER } from "./types/mutations"
+import {CURRENT_POST, CURRENT_POST_SOCKET, CURRENT_USER, CURRENT_USER_SOCKETS, MAIN_WALL_POSTS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
 const friendsRemoveUser = friendsType => (state, {user}) => {
@@ -93,5 +93,27 @@ export default {
         state[MAIN_WALL_POSTS] = []
         state[MAIN_WALL_POSTS_SOCKETS].forEach(socket => socket.close())
         state[MAIN_WALL_POSTS_SOCKETS] = []
+    },
+
+    [SET_CURRENT_USER](state, {user, sockets}) {
+        state[CURRENT_USER] = user
+        state[CURRENT_USER_SOCKETS] = sockets
+    },
+    [ADD_CURRENT_USER_POST](state, {post}) {
+        state[CURRENT_USER].posts = [
+            post,
+            ...state[CURRENT_USER].posts
+        ]
+    },
+    [CLEAR_CURRENT_USER](state) {
+        state[CURRENT_USER] = {}
+        const sockets = state[CURRENT_USER_SOCKETS]
+        if(sockets.private){
+            sockets.private.close()
+        }
+        if(sockets.public){
+            sockets.public.close()
+        }
+        state[CURRENT_USER_SOCKETS] = {}
     }
 }

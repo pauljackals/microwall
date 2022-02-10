@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import {mapState, mapActions, mapGetters} from "vuex"
-import {USER} from "../store/types/state"
-import {INVITE_FRIEND, CANCEL_FRIEND, ACCEPT_FRIEND, DECLINE_FRIEND, REMOVE_FRIEND} from "../store/types/actions"
-import api from '../services/api'
+import {mapState, mapActions, mapGetters, mapMutations} from "vuex"
+import {CURRENT_USER, USER} from "../store/types/state"
+import {INVITE_FRIEND, CANCEL_FRIEND, ACCEPT_FRIEND, DECLINE_FRIEND, REMOVE_FRIEND, GET_CURRENT_USER} from "../store/types/actions"
 import { FRIENDS_COMBINED, LOGGED_IN } from '../store/types/getters'
+import { CLEAR_CURRENT_USER } from '../store/types/mutations'
 
 export default {
     name: "User",
@@ -47,7 +47,7 @@ export default {
     },
     data() {
         return {
-            downloadedUser: null,
+            downloadedUser: false,
             checked: false
         }
     },
@@ -59,9 +59,8 @@ export default {
             })
 
         } else if(this.id !== "me") {
-            this.downloadedUser = {}
-            api.getUser(this.id).then(response => {
-                this.downloadedUser = response.data.user
+            this.downloadedUser = true
+            this.getCurrentUser({_id: this.id}).then(() => {
                 this.checked = true
             
             }).catch(() => this.$router.replace({
@@ -75,14 +74,15 @@ export default {
     },
     computed: {
         ...mapState({
-            user: USER
+            user: USER,
+            currentUserStore: CURRENT_USER
         }),
         ...mapGetters({
             loggedIn: LOGGED_IN,
             friendsCombined: FRIENDS_COMBINED
         }),
         currentUser() {
-            return this.downloadedUser ?? this.user
+            return this.downloadedUser ? this.currentUserStore : this.user
         },
         canInvite() {
             return this.friendsCombined.every(invite => invite._id!==this.currentUser._id)
@@ -118,8 +118,15 @@ export default {
             declineFriendAction: DECLINE_FRIEND,
             acceptFriendAction: ACCEPT_FRIEND,
             removeFriendAction: REMOVE_FRIEND,
-            cancelFriendAction: CANCEL_FRIEND
+            cancelFriendAction: CANCEL_FRIEND,
+            getCurrentUser: GET_CURRENT_USER
         }),
+        ...mapMutations({
+            clearCurrentUser: CLEAR_CURRENT_USER
+        })
+    },
+    unmounted(){
+        this.clearCurrentUser()
     }
 }
 </script>
