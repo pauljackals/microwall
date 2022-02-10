@@ -1,7 +1,7 @@
 import {io} from "socket.io-client"
 import isDevelopment from "../utils/isDevelopment"
 
-const baseURL = isDevelopment ? `http://localhost:5000` : ''
+const baseURL = isDevelopment ? `http://localhost:${process.env.VUE_APP_SERVER_PORT}` : ''
 const baseOptions = {
     withCredentials: true
 }
