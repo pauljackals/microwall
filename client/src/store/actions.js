@@ -20,6 +20,7 @@ import {
     ADD_COMMENT_TO_USER,
     ADD_CURRENT_USER_POST,
     ADD_MAIN_WALL_POSTS,
+    ADD_PRIVATE_WALL_SOCKET,
     CLEAR_PRIVATE_WALL_SOCKET,
     CLEAR_USER, FRIENDS_ADD_USER,
     FRIENDS_REMOVE_USER,
@@ -35,11 +36,17 @@ import {
     UPDATE_USER
 } from "./types/mutations"
 import api from "../services/api"
-import {USER, USER_SOCKET} from "./types/state"
+import {CURRENT_USER_SOCKETS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
-const listenToUser = (commit, id) => {
+const listenToPrivateWall = (commit, mutation, id) => {
+    return sio.listenToPrivateWall(id).on("post", ({post}) => {
+        commit(mutation, {post})
+    })
+}
+
+const listenToUser = (commit, id, state) => {
     const socket = sio.listenToUser(id)
 
     socket.on("comment", ({comment, isPrivate}) => {
@@ -53,11 +60,18 @@ const listenToUser = (commit, id) => {
         commit(INVITES_SENT_REMOVE_USER, {user})
     })
     socket.on("friendAccept", ({user}) => {
+        const mutation = state[CURRENT_USER_SOCKETS].public ? ADD_CURRENT_USER_POST
+            : (state[MAIN_WALL_POSTS_SOCKETS].main ? ADD_MAIN_WALL_POSTS : undefined)
+        if(mutation) {
+            const socket = listenToPrivateWall(commit, mutation, user._id)
+            commit(ADD_PRIVATE_WALL_SOCKET, {user, socket})
+        }
+
         commit(FRIENDS_ADD_USER, {user})
     })
     socket.on("friendRemove", ({user}) => {
-        commit(FRIENDS_REMOVE_USER, {user})
         commit(CLEAR_PRIVATE_WALL_SOCKET, {user})
+        commit(FRIENDS_REMOVE_USER, {user})
     })
     socket.on("friendCancel", ({user}) => {
         commit(INVITES_RECEIVED_REMOVE_USER, {user})
@@ -69,7 +83,7 @@ const listenToUser = (commit, id) => {
 const getFriendsIds = user => (user.friends ?? []).map(friend => friend._id)
 
 export default {
-    [LOGIN]({commit}, {
+    [LOGIN]({commit, state}, {
         username,
         password
     }) {
@@ -81,7 +95,7 @@ export default {
             const {user} = response.data
             commit(SET_USER, {user})
 
-            const socket = listenToUser(commit, user._id)
+            const socket = listenToUser(commit, user._id, state)
             commit(SET_USER_SOCKET, {socket})
         })
     },
@@ -94,12 +108,12 @@ export default {
         })
     },
 
-    [GET_USER_DATA]({commit}) {
+    [GET_USER_DATA]({commit, state}) {
         return api.getUserData().then(response => {
             const {user} = response.data
             commit(SET_USER, {user})
 
-            const socket = listenToUser(commit, user._id)
+            const socket = listenToUser(commit, user._id, state)
             commit(SET_USER_SOCKET, {socket})
         })
     },
@@ -136,6 +150,7 @@ export default {
         return api.removeFriend(_id).then(response => {
             const {user} = response.data
             commit(FRIENDS_REMOVE_USER, {user})
+            commit(CLEAR_PRIVATE_WALL_SOCKET, {user})
         })
     },
 
@@ -143,6 +158,9 @@ export default {
         return api.acceptFriend(_id).then(response => {
             const {user} = response.data
             commit(FRIENDS_ADD_USER, {user})
+            
+            const socket = listenToPrivateWall(commit, ADD_CURRENT_USER_POST, user._id)
+            commit(ADD_PRIVATE_WALL_SOCKET, {user, socket})
         })
     },
 
@@ -189,9 +207,7 @@ export default {
             const {posts} = response.data
             const sockets = (state[USER].friends ?? [])
                 .reduce((object, friend) => {
-                    object[friend._id] = sio.listenToPrivateWall(friend._id).on("post", ({post}) => {
-                        commit(ADD_MAIN_WALL_POSTS, {post})
-                    })
+                    object[friend._id] = listenToPrivateWall(commit, ADD_MAIN_WALL_POSTS, friend._id)
                     return object
                 }, {})
             
@@ -219,9 +235,7 @@ export default {
                 }),
                 
                 private: getFriendsIds(state[USER]).includes(_id)
-                    ? sio.listenToPrivateWall(_id).on("post", ({post}) => {
-                        commit(ADD_CURRENT_USER_POST, {post})
-                    })
+                    ? listenToPrivateWall(commit, ADD_CURRENT_USER_POST, _id)
                     : undefined
             }
 
