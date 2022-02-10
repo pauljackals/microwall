@@ -13,7 +13,7 @@ export default createStore({
         [CURRENT_POST_SOCKET]: null,
 
         [MAIN_WALL_POSTS]: [],
-        [MAIN_WALL_POSTS_SOCKETS]: [],
+        [MAIN_WALL_POSTS_SOCKETS]: {},
 
         [CURRENT_USER]: {},
         [CURRENT_USER_SOCKETS]: {}

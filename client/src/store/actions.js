@@ -20,6 +20,7 @@ import {
     ADD_COMMENT_TO_USER,
     ADD_CURRENT_USER_POST,
     ADD_MAIN_WALL_POSTS,
+    CLEAR_PRIVATE_WALL_SOCKET,
     CLEAR_USER, FRIENDS_ADD_USER,
     FRIENDS_REMOVE_USER,
     INVITES_RECEIVED_ADD_USER,
@@ -56,6 +57,7 @@ const listenToUser = (commit, id) => {
     })
     socket.on("friendRemove", ({user}) => {
         commit(FRIENDS_REMOVE_USER, {user})
+        commit(CLEAR_PRIVATE_WALL_SOCKET, {user})
     })
     socket.on("friendCancel", ({user}) => {
         commit(INVITES_RECEIVED_REMOVE_USER, {user})
@@ -186,15 +188,19 @@ export default {
         return api.getPosts().then(response => {
             const {posts} = response.data
             const sockets = (state[USER].friends ?? [])
-                .map(friend => sio.listenToPrivateWall(friend._id).on("post", ({post}) => {
-                    commit(ADD_MAIN_WALL_POSTS, {post})
-                }))
-                .concat(sio.listenToMainWall().on("post", ({post}) => {
-                    if(post.access===POST_ACCESS_ENUM.GENERAL && getFriendsIds(state[USER]).includes(post.user._id)) {
-                        return
-                    }
-                    commit(ADD_MAIN_WALL_POSTS, {post})
-                }))
+                .reduce((object, friend) => {
+                    object[friend._id] = sio.listenToPrivateWall(friend._id).on("post", ({post}) => {
+                        commit(ADD_MAIN_WALL_POSTS, {post})
+                    })
+                    return object
+                }, {})
+            
+            sockets.main = sio.listenToMainWall().on("post", ({post}) => {
+                if(post.access===POST_ACCESS_ENUM.GENERAL && getFriendsIds(state[USER]).includes(post.user._id)) {
+                    return
+                }
+                commit(ADD_MAIN_WALL_POSTS, {post})
+            })
 
             commit(SET_MAIN_WALL_POSTS, {posts, sockets})
         })

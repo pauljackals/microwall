@@ -1,4 +1,4 @@
-import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, INVITES_SENT_ADD_USER, INVITES_RECEIVED_ADD_USER, INVITES_SENT_REMOVE_USER, INVITES_RECEIVED_REMOVE_USER, FRIENDS_REMOVE_USER, FRIENDS_ADD_USER, SET_MAIN_WALL_POSTS, ADD_MAIN_WALL_POSTS, CLEAR_MAIN_WALL_POSTS, SET_CURRENT_USER, ADD_CURRENT_USER_POST, CLEAR_CURRENT_USER } from "./types/mutations"
+import { CLEAR_USER, SET_CURRENT_POST, SET_USER, UPDATE_USER, CLEAR_CURRENT_POST, ADD_COMMENT_TO_CURRENT_POST, ADD_COMMENT_TO_USER, SET_USER_SOCKET, INVITES_SENT_ADD_USER, INVITES_RECEIVED_ADD_USER, INVITES_SENT_REMOVE_USER, INVITES_RECEIVED_REMOVE_USER, FRIENDS_REMOVE_USER, FRIENDS_ADD_USER, SET_MAIN_WALL_POSTS, ADD_MAIN_WALL_POSTS, CLEAR_MAIN_WALL_POSTS, SET_CURRENT_USER, ADD_CURRENT_USER_POST, CLEAR_CURRENT_USER, CLEAR_PRIVATE_WALL_SOCKET } from "./types/mutations"
 import {CURRENT_POST, CURRENT_POST_SOCKET, CURRENT_USER, CURRENT_USER_SOCKETS, MAIN_WALL_POSTS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
@@ -91,8 +91,8 @@ export default {
     },
     [CLEAR_MAIN_WALL_POSTS](state) {
         state[MAIN_WALL_POSTS] = []
-        state[MAIN_WALL_POSTS_SOCKETS].forEach(socket => socket.close())
-        state[MAIN_WALL_POSTS_SOCKETS] = []
+        Object.values(state[MAIN_WALL_POSTS_SOCKETS]).forEach(socket => socket && socket.close())
+        state[MAIN_WALL_POSTS_SOCKETS] = {}
     },
 
     [SET_CURRENT_USER](state, {user, sockets}) {
@@ -115,5 +115,23 @@ export default {
             sockets.public.close()
         }
         state[CURRENT_USER_SOCKETS] = {}
+    },
+
+    [CLEAR_PRIVATE_WALL_SOCKET](state, {user}) {
+        const {_id} = user
+        if(state[CURRENT_USER]._id===_id) {
+            const sockets = state[CURRENT_USER_SOCKETS]
+            if(sockets.private){
+                sockets.private.close()
+                sockets.private = undefined
+            }
+
+        } else {
+            const socket = state[MAIN_WALL_POSTS_SOCKETS][_id]
+            if(socket) {
+                socket.close()
+                state[MAIN_WALL_POSTS_SOCKETS][_id] = undefined
+            }
+        }
     }
 }
