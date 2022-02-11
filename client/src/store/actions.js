@@ -13,7 +13,8 @@ import {
     GET_POST,
     COMMENT_CURRENT_POST,
     GET_MAIN_WALL_POSTS,
-    GET_CURRENT_USER
+    GET_CURRENT_USER,
+    GET_MAIN_WALL_POSTS_MORE
 } from "./types/actions"
 import {
     ADD_COMMENT_TO_CURRENT_POST,
@@ -21,6 +22,7 @@ import {
     ADD_CURRENT_USER_POST,
     ADD_MAIN_WALL_POSTS,
     ADD_PRIVATE_WALL_SOCKET,
+    APPEND_MAIN_WALL_POSTS,
     CLEAR_CURRENT_POST,
     CLEAR_CURRENT_POST_SOCKET,
     CLEAR_CURRENT_USER,
@@ -214,7 +216,7 @@ export default {
 
     [GET_MAIN_WALL_POSTS]({commit, state}) {
         return api.getPosts().then(response => {
-            const {posts} = response.data
+            const {posts, last} = response.data
             const sockets = (state[USER].friends ?? [])
                 .reduce((object, friend) => {
                     object[friend._id] = listenToPrivateWall(commit, ADD_MAIN_WALL_POSTS, friend._id)
@@ -229,6 +231,16 @@ export default {
             })
 
             commit(SET_MAIN_WALL_POSTS, {posts, sockets})
+
+            return last
+        })
+    },
+    [GET_MAIN_WALL_POSTS_MORE]({commit}, {_id}){
+        return api.getPosts(_id).then(response => {
+            const {posts, last} = response.data
+
+            commit(APPEND_MAIN_WALL_POSTS, {posts})
+            return last
         })
     },
 

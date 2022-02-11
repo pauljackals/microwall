@@ -63,8 +63,8 @@ export default {
         return axios.patch(`/user/${_id}/friend/cancel`)
     },
 
-    getPosts() {
-        return axios.get("/post")
+    getPosts(idLast) {
+        return axios.get("/post", {params: {idLast}})
     },
     addPost(text, access, links, images) {
         return axios.post("/post", {

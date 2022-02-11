@@ -8,6 +8,8 @@ const sio = require("../namespaces/namespaces")
 const { filterFriend } = require("../utils/functions")
 
 router.get("/", (req, res, next) => {
+    const {query: {idLast}} = req
+
     const isAuthenticated = req.isAuthenticated()
     const notPrivatePosts = {access: {$ne: POST_ACCESS_ENUM.PRIVATE}}
 
@@ -20,7 +22,10 @@ router.get("/", (req, res, next) => {
     
     ]}).select("+commentsPublic +commentsPrivate") : Post.find(notPrivatePosts)
 
-    query.exec().then(posts => {
+    const queryPaginated = [undefined, ""].includes(idLast) ? query : query.where("_id").lt(idLast)
+
+    const limit = 20
+    queryPaginated.limit(limit+1).exec().then(posts => {
         if(isAuthenticated) {
             posts.forEach(post => {
                 if(post.access===POST_ACCESS_ENUM.GENERAL && post.user._id.toString()!==req.user._id.toString() && !req.user.friends.some(friend => friend._id.toString() === post.user._id.toString())){
@@ -28,7 +33,7 @@ router.get("/", (req, res, next) => {
                 }
             })
         }
-        res.status(200).json({posts})
+        res.status(200).json({posts: posts.slice(0, limit), last: posts.length <= limit})
 
     }).catch(err => next(err))
 })
