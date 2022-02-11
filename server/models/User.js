@@ -39,7 +39,11 @@ const passwordValidator = (password, cb) => {
 }
 
 userSchema.plugin(passportLocalMongoose, {
-    populateFields: {path: "friends invitesSent invitesReceived posts", options: {sort:{"posts.date":1}}, select:"+commentsPublic +commentsPrivate"},
+    populateFields: {
+        path: "friends invitesSent invitesReceived posts",
+        options: {sort:{"posts.date":1}},
+        select:"+commentsPublic +commentsPrivate"
+    },
     passwordValidator
 })
 

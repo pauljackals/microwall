@@ -139,10 +139,7 @@ export default {
     },
 
     [UPDATE_USER_LOGIN]({commit}, {password, passwordOld}) {
-        return api.updateUserLogin(password, passwordOld).then(response => {
-            // const {} = response.data.user
-            // commit(UPDATE_USER, {})
-        })
+        return api.updateUserLogin(password, passwordOld)
     },
 
     [INVITE_FRIEND]({commit}, {_id}) {
