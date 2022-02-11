@@ -46,21 +46,20 @@ router.post("/login", (req, res, next) => {
 })
 
 router.delete("/logout", authenticationCheck, (req, res) => {
-    const {
-        sessionID,
-        user: {_id}
-    } = req
+    const {sessionID} = req
     
     req.logout()
     req.session.destroy(() => {
         res.clearCookie("connect.sid");
 
-        sio.of(`/user/${_id}`).fetchSockets().then(sockets => {
+        const disconnectSocket = namespace => sio.of(namespace).fetchSockets().then(sockets => {
             const socket = sockets.find(socket => socket.client.conn.request.sessionID === sessionID)
             if(socket) {
-                socket.disconnect(true)
+                socket.disconnect()
             }
         })
+        const namespaces = [...sio._nsps.keys()]
+        namespaces.forEach(disconnectSocket)
 
         res.status(200).json({message: "logged out"})
     })

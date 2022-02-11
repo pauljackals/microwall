@@ -21,7 +21,10 @@ import {
     ADD_CURRENT_USER_POST,
     ADD_MAIN_WALL_POSTS,
     ADD_PRIVATE_WALL_SOCKET,
+    CLEAR_CURRENT_POST,
     CLEAR_CURRENT_POST_SOCKET,
+    CLEAR_CURRENT_USER,
+    CLEAR_MAIN_WALL_POSTS,
     CLEAR_PRIVATE_WALL_SOCKET,
     CLEAR_USER, FRIENDS_ADD_USER,
     FRIENDS_REMOVE_USER,
@@ -111,6 +114,10 @@ export default {
             commit(CLEAR_USER)
             state[USER_SOCKET].close()
             commit(SET_USER_SOCKET, {socket: null})
+
+            commit(CLEAR_CURRENT_USER)
+            commit(CLEAR_CURRENT_POST)
+            commit(CLEAR_MAIN_WALL_POSTS)
         })
     },
 

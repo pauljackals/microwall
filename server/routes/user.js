@@ -11,11 +11,6 @@ const {
 } = require("../utils/errors")
 const { filterFriend } = require("../utils/functions")
 
-// router.get("/test", (req, res) => {
-//     sio.of("/user/62015bdc32a1fc8fbcce4f90").fetchSockets().then(x => console.log(x[0].client.conn.request))
-//     res.json()
-// })
-
 router.get("/me", authenticationCheck, (req, res) => {
     const user = req.user
 
