@@ -21,6 +21,7 @@ import {
     ADD_CURRENT_USER_POST,
     ADD_MAIN_WALL_POSTS,
     ADD_PRIVATE_WALL_SOCKET,
+    CLEAR_CURRENT_POST_SOCKET,
     CLEAR_PRIVATE_WALL_SOCKET,
     CLEAR_USER, FRIENDS_ADD_USER,
     FRIENDS_REMOVE_USER,
@@ -36,7 +37,7 @@ import {
     UPDATE_USER
 } from "./types/mutations"
 import api from "../services/api"
-import {CURRENT_USER, CURRENT_USER_SOCKETS, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
+import {CURRENT_POST, CURRENT_USER, MAIN_WALL_POSTS_SOCKETS, USER, USER_SOCKET} from "./types/state"
 import sio from "../services/sio"
 import {POST_ACCESS_ENUM} from "../utils/types"
 
@@ -72,6 +73,11 @@ const listenToUser = (commit, id, state) => {
     socket.on("friendRemove", ({user}) => {
         commit(CLEAR_PRIVATE_WALL_SOCKET, {user})
         commit(FRIENDS_REMOVE_USER, {user})
+
+        const access = state[CURRENT_POST].access
+        if(access===POST_ACCESS_ENUM.PRIVATE || access===POST_ACCESS_ENUM.GENERAL && state[CURRENT_POST].commentsPrivate) {
+            commit(CLEAR_CURRENT_POST_SOCKET)
+        }
     })
     socket.on("friendCancel", ({user}) => {
         commit(INVITES_RECEIVED_REMOVE_USER, {user})

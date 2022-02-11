@@ -249,17 +249,30 @@ router.patch("/:id/friend/remove", authenticationCheck, (req, res, next) => {
         }
 
         user.friends.splice(user.friends.findIndex(user => user._id.toString()===idFriend), 1)
+        const posts = [...user.posts]
         return user.save().then(user => {
             if(!user) {
                 throw new FriendError()
             }
             sio.of(`/user/${idFriend}`).emit("friendRemove", {user: filterFriend(user)})
 
-            const disconnectSockets = (idWall, idListener) => sio.of(`/user/${idWall}/private`).fetchSockets().then(sockets => {
-                sockets.forEach(socket => socket.client.conn.request.user._id.toString()===idListener && socket.disconnect())
+            const disconnectSockets = (namespace, idListener, extraSocketCheck=()=>true) => sio.of(namespace).fetchSockets().then(sockets => {
+                sockets.forEach(socket => {
+                    if(socket.client.conn.request.user._id.toString()===idListener && extraSocketCheck(socket)) {
+                        socket.disconnect()
+                    }
+                })
             })
-            disconnectSockets(idUser, idFriend)
-            disconnectSockets(idFriend, idUser.toString())
+            disconnectSockets(`/user/${idUser}/private`, idFriend)
+            disconnectSockets(`/user/${idFriend}/private`, idUser.toString())
+            posts.forEach(post => {
+                if(post.access!==POST_ACCESS_ENUM.PUBLIC) {
+                    const extraSocketCheck = post.access===POST_ACCESS_ENUM.GENERAL
+                        ? socket => socket.client.conn.request.query.isPrivate==="true"
+                        : ()=>true
+                    disconnectSockets(`/post/${post._id}`, idFriend, extraSocketCheck)
+                }
+            })
             
             res.status(200).json({user: userRemoved})
         })
