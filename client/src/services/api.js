@@ -40,8 +40,8 @@ export default {
         })
     },
 
-    getUsers() {
-        return axios.get("/user")
+    getUsers(username) {
+        return axios.get("/user", {params: {username}})
     },
     getUser(_id) {
         return axios.get(`/user/${_id}`)

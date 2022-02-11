@@ -61,9 +61,12 @@ router.patch("/me/login", authenticationCheck, (req, res, next) => {
 })
 
 router.get("/", (req, res, next) => {
+    const {query: {username}} = req
+
     const options = req.isAuthenticated() ? {_id: {$ne: req.user._id}} : {}
+    const usernameFilter = !["", undefined].includes(username) ? {username:{$regex: `^${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`}} : {}
     
-    User.find(options).select("-posts").exec().then(users => {
+    User.find({...options, ...usernameFilter}).select("-posts").sort("username").limit(20).exec().then(users => {
         res.status(200).json({users})
     
     }).catch(err => next(err))
